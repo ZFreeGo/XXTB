@@ -1,0 +1,61 @@
+Dependencies for Project 'XXTB', Target 'CommunicationManagement': (DO NOT MODIFY !)
+F (.\source\CMSIS\core_cm3.c)(0x4AEA4D54)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork -I.\source\DeviceIO -I.\source -I.\source\CAN -I.\source\DeviceNet-I "D:\Program Files (x86)\Keil_5.0\ARM\RV31\INC"-I "D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include"-I "D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx"-o .\out\core_cm3.o --omf_browse .\out\core_cm3.crf --depend .\out\core_cm3.d)
+I (D:\Program Files (x86)\Keil_5.0\ARM\ARMCC\include\stdint.h)(0x53463A44)
+F (.\source\CMSIS\core_cm3.h)(0x58214585)()
+F (.\source\CMSIS\LPC17xx.h)(0x5821C1CF)()
+F (.\source\CMSIS\system_LPC17xx.c)(0x5821BDA9)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork -I.\source\DeviceIO -I.\source -I.\source\CAN -I.\source\DeviceNet-I "D:\Program Files (x86)\Keil_5.0\ARM\RV31\INC"-I "D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include"-I "D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx"-o .\out\system_lpc17xx.o --omf_browse .\out\system_lpc17xx.crf --depend .\out\system_lpc17xx.d)
+I (D:\Program Files (x86)\Keil_5.0\ARM\ARMCC\include\stdint.h)(0x53463A44)
+I (source\CMSIS\LPC17xx.h)(0x5821C1CF)
+I (source\CMSIS\core_cm3.h)(0x58214585)
+I (source\CMSIS\system_LPC17xx.h)(0x4AD3B726)
+F (.\source\CMSIS\system_LPC17xx.h)(0x4AD3B726)()
+F (.\source\CMSIS\startup\arm\startup_LPC17xx.s)(0x5821928E)(--cpu Cortex-M3 -g --apcs=interwork -I "D:\Program Files (x86)\Keil_5.0\ARM\RV31\INC"-I "D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include"-I "D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx"--list .\out\startup_lpc17xx.lst --xref -o .\out\startup_lpc17xx.o --depend .\out\startup_lpc17xx.d)
+F (.\source\DeviceIO\DeviceIO.h)(0x58227465)()
+F (.\source\DeviceIO\DeviceIO.c)(0x58C2123C)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork -I.\source\DeviceIO -I.\source -I.\source\CAN -I.\source\DeviceNet-I "D:\Program Files (x86)\Keil_5.0\ARM\RV31\INC"-I "D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include"-I "D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx"-o .\out\deviceio.o --omf_browse .\out\deviceio.crf --depend .\out\deviceio.d)
+I (source\DeviceIO\DeviceIO.h)(0x58227465)
+I (D:\Program Files (x86)\Keil_5.0\ARM\ARMCC\include\stdint.h)(0x53463A44)
+I (D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx\LPC17xx.h)(0x5346377A)
+I (D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm3.h)(0x538426C6)
+I (D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmInstr.h)(0x5302A2D0)
+I (D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmFunc.h)(0x5302A2D0)
+I (D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx\system_LPC17xx.h)(0x5346377A)
+F (.\source\App\main.c)(0x58C211F5)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork -I.\source\DeviceIO -I.\source -I.\source\CAN -I.\source\DeviceNet-I "D:\Program Files (x86)\Keil_5.0\ARM\RV31\INC"-I "D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include"-I "D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx"-o .\out\main.o --omf_browse .\out\main.crf --depend .\out\main.d)
+I (D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx\LPC17xx.h)(0x5346377A)
+I (D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm3.h)(0x538426C6)
+I (D:\Program Files (x86)\Keil_5.0\ARM\ARMCC\include\stdint.h)(0x53463A44)
+I (D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmInstr.h)(0x5302A2D0)
+I (D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmFunc.h)(0x5302A2D0)
+I (D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx\system_LPC17xx.h)(0x5346377A)
+I (D:\Program Files (x86)\Keil_5.0\ARM\ARMCC\include\math.h)(0x53463A44)
+I (.\source\DeviceIO\DeviceIO.h)(0x58227465)
+I (.\source\CAN\CAN.h)(0x58C21425)
+F (.\source\485\UART.c)(0x5821C1A1)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork -I.\source\DeviceIO -I.\source -I.\source\CAN -I.\source\DeviceNet-I "D:\Program Files (x86)\Keil_5.0\ARM\RV31\INC"-I "D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include"-I "D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx"-o .\out\uart.o --omf_browse .\out\uart.crf --depend .\out\uart.d)
+I (D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx\lpc17xx.h)(0x5346377A)
+I (D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm3.h)(0x538426C6)
+I (D:\Program Files (x86)\Keil_5.0\ARM\ARMCC\include\stdint.h)(0x53463A44)
+I (D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmInstr.h)(0x5302A2D0)
+I (D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmFunc.h)(0x5302A2D0)
+I (D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx\system_LPC17xx.h)(0x5346377A)
+I (source\485\UART.h)(0x5821C1DC)
+F (.\source\485\UART.h)(0x5821C1DC)()
+F (.\source\CAN\CAN.c)(0x582C3248)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork -I.\source\DeviceIO -I.\source -I.\source\CAN -I.\source\DeviceNet-I "D:\Program Files (x86)\Keil_5.0\ARM\RV31\INC"-I "D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include"-I "D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx"-o .\out\can.o --omf_browse .\out\can.crf --depend .\out\can.d)
+I (D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx\LPC17xx.H)(0x5346377A)
+I (D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm3.h)(0x538426C6)
+I (D:\Program Files (x86)\Keil_5.0\ARM\ARMCC\include\stdint.h)(0x53463A44)
+I (D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmInstr.h)(0x5302A2D0)
+I (D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmFunc.h)(0x5302A2D0)
+I (D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx\system_LPC17xx.h)(0x5346377A)
+I (source\CAN\CAN.h)(0x58C21425)
+F (.\source\CAN\CAN.h)(0x58C21425)()
+F (.\source\RTC\rtc.c)(0x5822D1EC)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork -I.\source\DeviceIO -I.\source -I.\source\CAN -I.\source\DeviceNet-I "D:\Program Files (x86)\Keil_5.0\ARM\RV31\INC"-I "D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include"-I "D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx"-o .\out\rtc.o --omf_browse .\out\rtc.crf --depend .\out\rtc.d)
+I (D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx\lpc17xx.h)(0x5346377A)
+I (D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm3.h)(0x538426C6)
+I (D:\Program Files (x86)\Keil_5.0\ARM\ARMCC\include\stdint.h)(0x53463A44)
+I (D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmInstr.h)(0x5302A2D0)
+I (D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmFunc.h)(0x5302A2D0)
+I (D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx\system_LPC17xx.h)(0x5346377A)
+I (source\RTC\rtc.h)(0x5821C754)
+F (.\source\RTC\rtc.h)(0x5821C754)()
+F (.\source\DeviceNet\DeviceNet.c)(0x58C22509)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork -I.\source\DeviceIO -I.\source -I.\source\CAN -I.\source\DeviceNet-I "D:\Program Files (x86)\Keil_5.0\ARM\RV31\INC"-I "D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include"-I "D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx"-o .\out\devicenet.o --omf_browse .\out\devicenet.crf --depend .\out\devicenet.d)
+I (source\DeviceNet\DeviceNet.h)(0x58C21F8D)
+F (.\source\DeviceNet\DeviceNet.h)(0x58C21F8D)()

@@ -1,0 +1,2 @@
+Dependencies for Project 'XXTB', Target 'Target 1': (DO NOT MODIFY !)
+F (.\startup_LPC17xx.s)(0x4E3FB9DE)(--cpu Cortex-M3 -g --apcs=interwork -I "D:\Program Files (x86)\keil\ARM\CMSIS\Include" -I "D:\Program Files (x86)\keil\ARM\INC\NXP\LPC17xx" --list "startup_LPC17xx.lst" --xref -o "startup_LPC17xx.o" --depend "startup_LPC17xx.d")
