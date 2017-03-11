@@ -42,4 +42,7 @@ extern unsigned int  CAN_TxRdy[2];      /* CAN HW ready to transmit a message */
 extern unsigned int  CAN_RxRdy[2];      /* CAN HW received a message */
 
 
+#define CAN1 1
+#define CAN2 2
+
 #endif

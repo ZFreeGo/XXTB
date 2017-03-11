@@ -15,7 +15,8 @@
 BOOL IsTimeRemain(void);    //需要根据具体平台改写
 void StartOverTimer(void);//需要根据具体平台改写
 void SendData(struct DefFrameData* pFrame);//需要根据具体平台改写
-
+void ResponseMACID(struct DefFrameData* pSendFrame, BYTE config);
+void InitYongciAData(void);
 
 ////////////////////////////////////////////////////////////可考虑存入EEPROM
 UINT  providerID = 0X1234;               // 供应商ID 
@@ -41,7 +42,47 @@ BYTE  ReciveBufferData[10];//接收缓冲数据
 struct DefFrameData  DeviceNetReciveFrame; //接收帧处理
 struct DefFrameData  DeviceNetSendFrame; //接收帧处理
 
-BYTE  out_Data[8];//从站输出数组
+struct DefStationElement MasterStation;  //主站
+
+
+/**
+ * 永磁控制器A子站
+ */
+struct DefStationElement    YongciA_Station; //永磁控制器A子站
+
+struct DefDeviceNetClass    YongciA_DeviceNetCDlass = {1}; //
+struct DefDeviceNetObj      YongciA_DeviceNetObj;
+struct DefIdentifierObject  YongciA_IdentifierObj; 
+
+struct DefConnectionObj     YongciA_IOCyclePollctionObj;//循环IO响应
+struct DefConnectionObj     YongciA_VisibleConnectionObj;   //显示连接
+
+struct DefFrameData  YongciA_ReciveFrame; //接收帧处理
+struct DefFrameData  YongciA_SendFrame; //接收帧处理
+
+
+/**
+ * 当前处理所指向的子站指针
+ */
+struct DefStationElement*    g_pCurrrentStation; 
+
+
+/**
+ * 初始化YongciA 所涉及的基本数据
+ */
+void InitYongciAData(void)
+{
+    YongciA_Station.pDeviceNetObj = &YongciA_DeviceNetObj;
+    YongciA_Station.pIdentifier = &YongciA_IdentifierObj;
+    YongciA_Station.pRecive = &YongciA_ReciveFrame;
+    YongciA_Station.pSend = &YongciA_SendFrame;
+    YongciA_Station.pDeviceNetClass = &YongciA_DeviceNetCDlass;
+    YongciA_Station.pVisibleConnection = &YongciA_VisibleConnectionObj;
+    YongciA_Station.pIOCyclePollCommandConnection = &YongciA_IOCyclePollctionObj;
+    YongciA_Station.pStatusChangeCycleConnection = 0;
+    YongciA_Station.pIOBitStrobeConnection = 0;
+}
+
 
 /**
  * 初始化DeviceNet所涉及的基本数据
@@ -49,12 +90,14 @@ BYTE  out_Data[8];//从站输出数组
 void InitDeviceNet()
 {    
     DeviceNetReciveFrame.complteFlag = 0xff;
+    DeviceNetReciveFrame.waitFlag = 0;
     DeviceNetReciveFrame.pBuffer = ReciveBufferData;
     DeviceNetSendFrame.complteFlag = 0xff;
     DeviceNetSendFrame.pBuffer = SendBufferData;
+    DeviceNetSendFrame.waitFlag = 0;
   
     //////////初始化DeviceNetObj对象////////////////////////////////
-	DeviceNetObj.MACID =0x02 ;                   //如果跳键没有设置从站地址，默认从站地址0x02            
+	DeviceNetObj.MACID =0x20 ;                   //如果跳键没有设置从站地址，默认主站地址0x02            
 	DeviceNetObj.baudrate = 2;                   //500Kbit/s
 	DeviceNetObj.assign_info.select = 0;         //初始的配置选择字节清零
 	DeviceNetObj.assign_info.master_MACID =0x0A; //默认主站地址，在预定义主从连接建立过程中，主站还会告诉从站：主站的地址
@@ -69,8 +112,139 @@ void InitDeviceNet()
 	IdentifierObj.version.minor_ver = minor_ver;  //minor_ver = 1;版本
 	IdentifierObj.serialID = serialID;            //serialID = 0x001169BC;;序列号
 	IdentifierObj.product_name = product_name;    //product_name = {8, "ADC4"};产品名称
+    
+    MasterStation.pDeviceNetObj = &DeviceNetObj;
+    MasterStation.pIdentifier = &IdentifierObj;
+    MasterStation.pRecive = &DeviceNetReciveFrame;
+    MasterStation.pSend = &DeviceNetSendFrame;
+    MasterStation.pDeviceNetClass = 0;
+    MasterStation.pVisibleConnection = 0;
+    MasterStation.pIOCyclePollCommandConnection = 0;
+    MasterStation.pStatusChangeCycleConnection = 0;
+    MasterStation.pIOBitStrobeConnection = 0;
+    
+    InitYongciAData();
+    
+    g_pCurrrentStation = &YongciA_Station;
 }
 
+
+
+
+/**
+ * 从站显示信息应答报文处理函数
+ *
+ * @param   pReciveFrame   指向接收报文数据的指针,表示已经接收到的数据
+ * @param   pHistoryFrame  指向历史发送报文,其和接收帧属于应答关系
+ */
+void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
+{  
+    if (!g_pCurrrentStation->pSend->waitFlag)//判断是否为等待
+    {
+        return;
+    }
+    if (g_pCurrrentStation->pDeviceNetObj->MACID != *pID) //判断是目的MAC与本机是否一致
+    {
+        return;
+    }
+    if ((pbuff[0] &  0x3F) != DeviceNetObj.MACID) //判断是否为同一个源MAC
+    {
+        return;
+    }
+    //判断服务代码是否是对应的应答代码,或者错误响应代码
+    if (((g_pCurrrentStation->pSend->pBuffer[1] |0x80) != pbuff[1]) || (pbuff[1] == (0x80 | SVC_ERROR_RESPONSE)))
+	{
+        return;
+    }
+    if (len  > 10) //长度过长
+    {
+            return;
+    }
+    for(USINT i = 0; i < len; i++)
+    {
+        g_pCurrrentStation->pRecive->pBuffer[i] = pbuff[i];
+    }
+    g_pCurrrentStation->pRecive->ID = *pID;
+    g_pCurrrentStation->pRecive->len = len;
+    
+    switch (g_pCurrrentStation->pRecive->pBuffer[1] & 0x7F)
+    {
+        case SVC_AllOCATE_MASTER_SlAVE_CONNECTION_SET://建立主从连接          
+        {
+            
+            break;
+        }
+        case SVC_RELEASE_GROUP2_IDENTIFIER_SET://释放主从连接 
+        {
+            break;
+        }
+        case SVC_GET_ATTRIBUTE_SINGLE: //获取单个属性
+        {
+            break;
+        }
+        case SVC_SET_ATTRIBUTE_SINGLE: //获取单个属性
+        {
+            break;
+        }
+       
+    }
+    
+    
+    
+}
+/**
+ * 生成仅限组2非连接显示请求信息
+ *
+ * @param   pFrame     指向报文数据的指针,长度指针表示所指向缓冲区的最小长度
+ * @param   destMAC    目的MAC地址
+ * @param   serverCode 服务代码
+ * @param   config     配置字节
+ * @return  <code>TRUE</code>   生成成功
+ *          <code>FASLE</code>  生成失败 
+ */
+BOOL MakeUnconnectVisibleRequestMessageOnlyGroup2(struct DefFrameData* pFrame, BYTE destMAC,BYTE serverCode, BYTE config)
+{
+   if ((pFrame->len >= 6) && (pFrame->complteFlag == 0))
+   {
+       pFrame->ID = MAKE_GROUP2_ID(GROUP2_VSILBLE_ONLY2, destMAC);
+       pFrame->pBuffer[0] = DeviceNetObj.MACID & 0x3F;  //本地MAC ID  
+       pFrame->pBuffer[1] = serverCode; 
+       pFrame->pBuffer[2] = 3;   //类ID  
+       pFrame->pBuffer[3] = 1;   //实例ID
+       pFrame->pBuffer[4] = config;
+       pFrame->pBuffer[5] = DeviceNetObj.MACID & 0x3F;
+       pFrame->len = 6;
+       pFrame->complteFlag = TRUE;
+   }
+   return FALSE;
+}
+/**
+ * 生成主站显示请求信息
+ *
+ * @param   pFrame     指向报文数据的指针,长度指针表示所指向缓冲区的最小长度
+ * @param   serverCode 服务代码
+ * @param   destMAC    目的MAC地址
+ * @param   class      选择类的ID
+ * @param   obj        选择的具体实例ID
+ * @param   attribute  选择的具体属性ID
+ * @return  <code>TRUE</code>   生成成功
+ *          <code>FASLE</code>  生成失败 
+ */
+BOOL MakeVisibleMessage(struct DefFrameData* pFrame,BYTE serverCode, BYTE destMAC, BYTE class, BYTE obj, BYTE attribute)
+{
+   if ((pFrame->len >= 5) && (pFrame->complteFlag == 0))
+   {
+       pFrame->ID = MAKE_GROUP2_ID(GROUP2_VSILBLE_ONLY2, destMAC);
+       pFrame->pBuffer[0] = DeviceNetObj.MACID & 0x3F;  //本地MAC ID  
+       pFrame->pBuffer[1] = serverCode; 
+       pFrame->pBuffer[2] = class;   //类ID  
+       pFrame->pBuffer[3] = obj;   //实例ID
+       pFrame->pBuffer[4] = attribute;
+       pFrame->len = 5;
+       pFrame->complteFlag = TRUE;
+   }
+   return FALSE;
+}
 
 
 /**
@@ -167,27 +341,56 @@ BYTE IsTimeRemain(void)
 
 /**
  * 主动检查重复MACID,判断网络中是否有与自己相同MAC的设备
+ * <p>
+ * 
  *
  * @param  pID      11bit ID号 
  * @param  pbuff    指向缓冲数据指针
  * @param  len      缓冲区数据长度
- * @return          <code>TRUE</code>   信息符合要求进行处理
- *                  <code>FASLE</code>  信息不符合要求未进行处理
+ * @return          <code>TRUE</code>   信息符合要求，进行处理
+ *                  <code>FASLE</code>  信息不符合要求，未进行处理
  */
 BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
 {   
     BYTE i= 0;
-    
-    
-    
-    
-    if( GROUP2_MSG != GET_GROUP2_MAC(*pID))  //不是仅限组2报文处理
-	{       
-        return FALSE;    
-    }        
-    
-    
-    
+
+   
+    if (((*pID) & 0x07C0) <= 0x3C0) //Group1
+    {
+        
+    }
+    else if (((*pID) & 0x0600) == 0x04000) //Group2
+    {
+        BYTE  mac = GET_GROUP2_MAC(*pID);
+        //从站显示应答服务
+        switch(GET_GROUP2_FUNCTION(*pID))
+        {
+            case GROUP2_VISIBLE_UCN: //从站显示响应服务
+            {
+                if (len >= 2)
+                SlaveStationVisibleMsgService(pID, pbuff, len);
+                break;
+            }
+            case GROUP2_REPEAT_MACID: //从站响应MAC ID重复检测
+            {
+                if (mac == DeviceNetObj.MACID)
+                {                     
+                    if( MasterStation.pSend->complteFlag) //检测是否被占用
+                    {
+                        return FALSE;
+                    }
+                    ResponseMACID(MasterStation.pSend, 0x80);       //重复MACID检查响应函数,应答，物理端口为0
+                }
+                break;
+            }
+        }
+    }
+    else
+    {
+        //其他信息
+    }
+
+
     
     
     if( DeviceNetReciveFrame.complteFlag) //
@@ -209,3 +412,5 @@ BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
     }
     return 0;
 }
+
+

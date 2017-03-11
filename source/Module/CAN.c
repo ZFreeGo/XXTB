@@ -110,7 +110,7 @@ void CAN_setup (uint32_t ctrl)
   pCAN->MOD   = 1;                               /* Enter reset mode */
   pCAN->IER   = 0;                               /* Disable all interrupts */
   pCAN->GSR   = 0;                               /* Clear status register */
-  CAN_cfgBaudrate(ctrl, 500000);                 /* Set bit timing */
+  CAN_cfgBaudrate(ctrl, 100000);                 /* Set bit timing */
   pCAN->IER   = 0x0003;                          /* Enable Tx and Rx interrupt */
 }
 
@@ -372,31 +372,31 @@ void CAN_IRQHandler (void)
   volatile uint32_t icr;
 
   /* check CAN controller 1 */
-  icr = LPC_CAN1->ICR;                           /* clear interrupts */
+//  icr = LPC_CAN1->ICR;                           /* clear interrupts */
 
-  if (icr & (1 << 0)) {                          /* CAN Controller #1 meassage is received */
-	CAN_rdMsg (1, &CAN_RxMsg[0]);                /*  read the message */
-    LPC_CAN1->CMR = (1 << 2);                    /* Release receive buffer */
+//  if (icr & (1 << 0)) {                          /* CAN Controller #1 meassage is received */
+//	CAN_rdMsg (1, &CAN_RxMsg[0]);                /*  read the message */
+//    LPC_CAN1->CMR = (1 << 2);                    /* Release receive buffer */
 
-    CAN_RxRdy[0] = 1;                            /*  set receive flag */
-  }
+//    CAN_RxRdy[0] = 1;                            /*  set receive flag */
+//  }
 
-  if (icr & (1 << 1)) {                          /* CAN Controller #1 meassage is transmitted */
-	CAN_TxRdy[0] = 1; 
-  }
+//  if (icr & (1 << 1)) {                          /* CAN Controller #1 meassage is transmitted */
+//	CAN_TxRdy[0] = 1; 
+//  }
 
   /* check CAN controller 2 */
-//  icr = LPC_CAN2->ICR;                           /* clear interrupts */
-//
-//  if (icr & (1 << 0)) {                          /* CAN Controller #2 meassage is received */
-//	CAN_rdMsg (2, &CAN_RxMsg[1]);                /*  read the message */
-//    LPC_CAN2->CMR = (1 << 2);                    /* Release receive buffer */
-//
-//    CAN_RxRdy[1] = 1;                            /*  set receive flag */
-//  }
-//
-//  if (icr & (1 << 1)) {                          /* CAN Controller #2 meassage is transmitted */
-//	CAN_TxRdy[1] = 1; 
-//  }
+  icr = LPC_CAN2->ICR;                           /* clear interrupts */
+
+  if (icr & (1 << 0)) {                          /* CAN Controller #2 meassage is received */
+	CAN_rdMsg (2, &CAN_RxMsg[1]);                /*  read the message */
+    LPC_CAN2->CMR = (1 << 2);                    /* Release receive buffer */
+
+    CAN_RxRdy[1] = 1;                            /*  set receive flag */
+  }
+
+  if (icr & (1 << 1)) {                          /* CAN Controller #2 meassage is transmitted */
+	CAN_TxRdy[1] = 1; 
+  }
 
 }

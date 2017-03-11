@@ -75,8 +75,7 @@ typedef UINT ENGUNITS;
 #define SVC_MONITOR_PLUSE		0x4D
 #define SVC_AllOCATE_MASTER_SlAVE_CONNECTION_SET	0x4B
 #define SVC_RELEASE_GROUP2_IDENTIFIER_SET			0x4C
-#define SVC_Create_Visible_Connectin_Set			0x4B
-#define SVC_Releas_Connection_Set					0x4C
+
 ////////////////////错误描述///////////////////////////////////////
 #define ERR_SUCCESS 				0x00	//成功执行了服务
 #define ERR_RES_INAVAIL 			0x02	//对象执行服务的资源不可用
@@ -190,10 +189,11 @@ struct DefConnectionObj
 //定义完整接收数据结构
 struct DefFrameData
 {
-      DINT ID;     //11bitID标识
-      BYTE len;    //数据长度
-      BYTE* pBuffer; //缓冲数据  
-      volatile BYTE complteFlag; //处理完成标志 非0--未处理完成；0--处理已经完成，可以重复使用
+    DINT ID;     //11bitID标识
+    BYTE len;    //数据长度
+    BYTE* pBuffer; //缓冲数据  
+    volatile BYTE complteFlag; //处理完成标志 非0--未处理完成；0--处理已经完成，可以重复使用
+    volatile BYTE waitFlag;    //正在等待应答 非0--等待应答； 0--不需要应答
 };
 
 #define GET_GROUP_NUM(id)  ((((id) >> 9))&0x0003)
@@ -208,10 +208,32 @@ struct DefFrameData
 //生成GROUP1 ID
 #define MAKE_GROUP1_ID( function, mac_id) (DINT)(((function &0x1F)>>6) | (mac_id & 0x3F))
 //生成GROUP2 ID
-#define MAKE_GROUP2_ID(  function,mac_id)  (DINT)( (0x0400) | ((DINT)(mac_id &0x1F)<<3) | (function & 0x07))
+#define MAKE_GROUP2_ID(  function,mac_id)  (DINT)( (0x0400) | ((DINT)(mac_id &0x3F)<<3) | (function & 0x07))
 
 #define FALSE (BYTE)0
 #define TRUE (BYTE)0xFF
+
+
+//站点要素定义体
+struct DefStationElement
+{
+     struct DefIdentifierObject  *pIdentifier; //执行标识符对象的指针
+     struct DefDeviceNetClass    *pDeviceNetClass; //执行对象类的指针
+     struct DefDeviceNetObj      *pDeviceNetObj;  //指向DeviceNet对象的指针
+    
+     struct DefConnectionObj     *pVisibleConnection;  //指向显示连接的指针
+     struct DefConnectionObj     *pIOCyclePollCommandConnection;       //指向IO轮询命令连接的指针,可以为空
+     struct DefConnectionObj     *pStatusChangeCycleConnection;  //指向状态变换/循环报文连接的指针,可以为空
+     struct DefConnectionObj     *pIOBitStrobeConnection;  //指向IO位选通连接的指针,可以为空
+    
+     struct DefFrameData        *pSend;     //指向发送报文的指针
+     struct DefFrameData        *pRecive;   //指向接收报文的指针
+     
+     //应用对象
+    
+};
+
+
 
 
 

@@ -4,88 +4,89 @@
 <h1>�Vision Build Log</h1>
 <h2>Project:</h2>
 J:\MyCode\MDK\XXTB\XXTB.uvproj
-Project File Date:  02/27/2017
+Project File Date:  03/10/2017
 
 <h2>Output:</h2>
 Build target 'CommunicationManagement'
-compiling DeviceNet.c...
+compiling main.c...
 linking...
-Program Size: Code=3756 RO-data=296 RW-data=36 ZI-data=676  
+Program Size: Code=4108 RO-data=296 RW-data=44 ZI-data=676  
 ".\OUT\XXTB.axf" - 0 Error(s), 0 Warning(s).
-piling rtc.c...
-compiling DeviceNet.c...
-linking...
-Program Size: Code=3756 RO-data=296 RW-data=36 ZI-data=676  
-".\OUT\XXTB.axf" - 0 Error(s), 0 Warning(s).
-g...
-Program Size: Code=3756 RO-data=296 RW-data=36 ZI-data=676  
-".\OUT\XXTB.axf" - 0 Error(s), 2 Warning(s).
-);
-source\DeviceNet\DeviceNet.c(152): error:  #20: identifier "IFS0bits" is undefined
-      if ( IFS0bits.T3IF )
-source\DeviceNet\DeviceNet.c(161): warning:  #1-D: last line of file ends without a newline
-  }
-source\DeviceNet\DeviceNet.c: 4 warnings, 1 error
-".\OUT\XXTB.axf" - 1 Error(s), 4 Warning(s).
-Target not created
-patible with previous "SendData" (declared at line 75)
-  void SendData(struct DefFrameData* pFrame)
-source\DeviceNet\DeviceNet.c(127): warning:  #223-D: function "CANSendData" declared implicitly
-       CANSendData(pFrame->ID, pFrame->pBuffer, pFrame->len);
-source\DeviceNet\DeviceNet.c(135): error:  #159: declaration is incompatible with previous "StartOverTimer" (declared at line 92)
-  void StartOverTimer()
-source\DeviceNet\DeviceNet.c(137): warning:  #223-D: function "SetTimer3" declared implicitly
-      SetTimer3(1000);   
-source\DeviceNet\DeviceNet.c(138): warning:  #223-D: function "StartTimer3" declared implicitly
-      StartTimer3();
-source\DeviceNet\DeviceNet.c(146): error:  #159: declaration is incompatible with previous "IsTimeRemain" (declared at line 93)
-  BYTE IsTimeRemain()
-source\DeviceNet\DeviceNet.c(148): error:  #20: identifier "IFS0bits" is undefined
-      if ( IFS0bits.T3IF )
-source\DeviceNet\DeviceNet.c(157): warning:  #1-D: last line of file ends without a newline
-  }
-source\DeviceNet\DeviceNet.c: 7 warnings, 4 errors
-".\OUT\XXTB.axf" - 4 Error(s), 7 Warning(s).
-Target not created
-et\DeviceNet.c(673): error:  #20: identifier "FALSE" is undefined
-        return FALSE;   //没有重复地址
-source\DeviceNet\DeviceNet.c(717): error:  #20: identifier "FALSE" is undefined
-          return FALSE;
-source\DeviceNet\DeviceNet.c(719): error:  #20: identifier "TRUE" is undefined
-      return TRUE;
-source\DeviceNet\DeviceNet.c(761): error:  #20: identifier "FALSE" is undefined
-          return FALSE;
-source\DeviceNet\DeviceNet.c(763): error:  #20: identifier "TRUE" is undefined
-      return TRUE;
-source\DeviceNet\DeviceNet.c(995): error:  #20: identifier "uint16" is undefined
-  BOOL DeviceNetReciveCenter(uint16* pID, uint8 * pbuff, uint8 len)
-source\DeviceNet\DeviceNet.c(995): error:  #20: identifier "uint8" is undefined
-  BOOL DeviceNetReciveCenter(uint16* pID, uint8 * pbuff, uint8 len)
-source\DeviceNet\DeviceNet.c(995): error:  #20: identifier "uint8" is undefined
-  BOOL DeviceNetReciveCenter(uint16* pID, uint8 * pbuff, uint8 len)
-source\DeviceNet\DeviceNet.c(1001): error:  #20: identifier "FALSE" is undefined
-          return FALSE;    
-source\DeviceNet\DeviceNet.c(1006): error:  #20: identifier "FALSE" is undefined
-          return FALSE;
-source\DeviceNet\DeviceNet.c(1018): error:  #20: identifier "TRUE" is undefined
-           return TRUE;
-source\DeviceNet\DeviceNet.c(1030): warning:  #223-D: function "CANSendData" declared implicitly
-       CANSendData(pFrame->ID, pFrame->pBuffer, pFrame->len);
-source\DeviceNet\DeviceNet.c(1040): warning:  #223-D: function "SetTimer3" declared implicitly
-      SetTimer3(1000);   
-source\DeviceNet\DeviceNet.c(1041): warning:  #223-D: function "StartTimer3" declared implicitly
-      StartTimer3();
-source\DeviceNet\DeviceNet.c(1051): error:  #20: identifier "IFS0bits" is undefined
-      if ( IFS0bits.T3IF )
-source\DeviceNet\DeviceNet.c(1054): error:  #20: identifier "FALSE" is undefined
-          return FALSE;
-source\DeviceNet\DeviceNet.c(1058): error:  #20: identifier "TRUE" is undefined
-          return TRUE;
-source\DeviceNet\DeviceNet.c: 7 warnings, 23 errors
-".\OUT\XXTB.axf" - 23 Error(s), 7 Warning(s).
-Target not created
-c(1058): error:  #20: identifier "TRUE" is undefined
-          return TRUE;
-source\DeviceNet\DeviceNet.c: 7 warnings, 23 errors
-".\OUT\XXTB.axf" - 23 Error(s), 7 Warning(s).
-Target not created
+Load "J:\\MyCode\\MDK\\XXTB\\OUT\\XXTB.axf" 
+Set JLink Project File to "J:\MyCode\MDK\XXTB\JLinkSettings.ini"
+* JLink Info: Device "LPC1768" selected (512 KB flash, 32 KB RAM).
+ 
+JLink info:
+------------
+DLL: V4.80g, compiled Feb 13 2014 20:50:02
+Firmware: J-Link ARM V8 compiled Jan 31 2018 18:34:52
+Hardware: V8.00
+S/N : 20080643 
+Feature(s) : RDI,FlashDL,FlashBP,JFlash,GDBFull 
+ 
+* JLink Info: TotalIRLen = 4, IRPrint = 0x01
+* JLink Info: Found Cortex-M3 r2p0, Little endian.
+* JLink Info: FPUnit: 6 code (BP) slots and 2 literal slots
+* JLink Info: TPIU fitted.
+* JLink Info: ETM fitted.
+ROMTableAddr = 0xE00FF003
+ 
+Target info:
+------------
+Device: LPC1768
+VTarget = 3.338V
+State of Pins: 
+TCK: 1, TDI: 0, TDO: 1, TMS: 0, TRES: 1, TRST: 1
+Hardware-Breakpoints: 6
+Software-Breakpoints: 8192
+Watchpoints:          4
+JTAG speed: 1000 kHz
+ 
+Erase Done.
+Programming Done.
+Verify OK.
+Application running ...
+Load "J:\\MyCode\\MDK\\XXTB\\OUT\\XXTB.axf" 
+Set JLink Project File to "J:\MyCode\MDK\XXTB\JLinkSettings.ini"
+* JLink Info: Device "LPC1768" selected (512 KB flash, 32 KB RAM).
+ 
+JLink info:
+------------
+DLL: V4.80g, compiled Feb 13 2014 20:50:02
+Firmware: J-Link ARM V8 compiled Jan 31 2018 18:34:52
+Hardware: V8.00
+S/N : 20080643 
+Feature(s) : RDI,FlashDL,FlashBP,JFlash,GDBFull 
+ 
+* JLink Info: TotalIRLen = 4, IRPrint = 0x01
+* JLink Info: Found Cortex-M3 r2p0, Little endian.
+* JLink Info: FPUnit: 6 code (BP) slots and 2 literal slots
+* JLink Info: TPIU fitted.
+* JLink Info: ETM fitted.
+ROMTableAddr = 0xE00FF003
+ 
+Target info:
+------------
+Device: LPC1768
+VTarget = 3.338V
+State of Pins: 
+TCK: 1, TDI: 0, TDO: 1, TMS: 0, TRES: 1, TRST: 1
+Hardware-Breakpoints: 6
+Software-Breakpoints: 8192
+Watchpoints:          4
+JTAG speed: 1000 kHz
+ 
+***JLink Error: Can not read register 0 (R0) while CPU is running
+***JLink Error: Can not read register 1 (R1) while CPU is running
+***JLink Error: Can not read register 2 (R2) while CPU is running
+***JLink Error: Can not read register 3 (R3) while CPU is running
+***JLink Error: Can not read register 4 (R4) while CPU is running
+***JLink Error: Can not read register 5 (R5) while CPU is running
+***JLink Error: Can not read register 6 (R6) while CPU is running
+Erase Done.
+Programming Done.
+Verify OK.
+Application running ...
+</pre>
+</body>
+</html>
