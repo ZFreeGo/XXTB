@@ -9,14 +9,18 @@
  * @author  ZhangYufei
  * @version 0.01
  */
-
+#include <LPC17xx.H> 
 #include "DeviceNet.h"
+#include "can.h"
 
 BOOL IsTimeRemain(void);    //需要根据具体平台改写
 void StartOverTimer(void);//需要根据具体平台改写
 void SendData(struct DefFrameData* pFrame);//需要根据具体平台改写
 void ResponseMACID(struct DefFrameData* pSendFrame, BYTE config);
 void InitYongciAData(void);
+static BOOL MakeUnconnectVisibleRequestMessageOnlyGroup2(struct DefFrameData* pFrame, 
+    BYTE destMAC,BYTE serverCode, BYTE config);
+static void EstablishConnection(void);
 
 ////////////////////////////////////////////////////////////可考虑存入EEPROM
 UINT  providerID = 0X1234;               // 供应商ID 
@@ -57,6 +61,8 @@ struct DefIdentifierObject  YongciA_IdentifierObj;
 struct DefConnectionObj     YongciA_IOCyclePollctionObj;//循环IO响应
 struct DefConnectionObj     YongciA_VisibleConnectionObj;   //显示连接
 
+BYTE  YongciA_ReciveBuffer[10];//接收缓冲数据
+BYTE  YongciA_SendBufferData[10];//接收缓冲数据
 struct DefFrameData  YongciA_ReciveFrame; //接收帧处理
 struct DefFrameData  YongciA_SendFrame; //接收帧处理
 
@@ -68,14 +74,29 @@ struct DefStationElement*    g_pCurrrentStation;
 
 
 /**
+ * 引用外部变量
+ */
+extern volatile uint32_t msTicks;
+static uint32_t DelayTimeMS;
+
+
+/**
  * 初始化YongciA 所涉及的基本数据
  */
 void InitYongciAData(void)
 {
+    YongciA_DeviceNetObj.MACID =0x02 ;                   //如果跳键没有设置从站地址，默认主站地址0x02      
+    
+    YongciA_ReciveFrame.pBuffer = YongciA_ReciveBuffer;
+    YongciA_SendFrame.pBuffer = YongciA_ReciveBuffer;
+    
     YongciA_Station.pDeviceNetObj = &YongciA_DeviceNetObj;
     YongciA_Station.pIdentifier = &YongciA_IdentifierObj;
     YongciA_Station.pRecive = &YongciA_ReciveFrame;
+    YongciA_ReciveFrame.len = 8;
     YongciA_Station.pSend = &YongciA_SendFrame;
+    YongciA_SendFrame.len = 8;
+    
     YongciA_Station.pDeviceNetClass = &YongciA_DeviceNetCDlass;
     YongciA_Station.pVisibleConnection = &YongciA_VisibleConnectionObj;
     YongciA_Station.pIOCyclePollCommandConnection = &YongciA_IOCyclePollctionObj;
@@ -126,6 +147,35 @@ void InitDeviceNet()
     InitYongciAData();
     
     g_pCurrrentStation = &YongciA_Station;
+    
+    BOOL result =  CheckMACID(&DeviceNetReciveFrame, &DeviceNetSendFrame);
+    
+    while(result);
+    EstablishConnection();
+    
+}
+/**
+ * 通过仅限组2显示信息服务建立连接
+ *
+ * @param   null
+ *
+ * @bref   建立连接
+ */
+static void EstablishConnection(void)
+{
+    //建立显示连接
+    BOOL result =  MakeUnconnectVisibleRequestMessageOnlyGroup2(g_pCurrrentStation->pSend, g_pCurrrentStation->pDeviceNetObj->MACID,
+    SVC_AllOCATE_MASTER_SlAVE_CONNECTION_SET, VISIBLE_MSG);
+    if (result)
+    {
+        SendData(g_pCurrrentStation->pSend);
+    }
+    else
+    {
+        while(TRUE);
+    }
+    
+
 }
 
 
@@ -137,7 +187,7 @@ void InitDeviceNet()
  * @param   pReciveFrame   指向接收报文数据的指针,表示已经接收到的数据
  * @param   pHistoryFrame  指向历史发送报文,其和接收帧属于应答关系
  */
-void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
+static void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
 {  
     if (!g_pCurrrentStation->pSend->waitFlag)//判断是否为等待
     {
@@ -202,7 +252,7 @@ void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
  * @return  <code>TRUE</code>   生成成功
  *          <code>FASLE</code>  生成失败 
  */
-BOOL MakeUnconnectVisibleRequestMessageOnlyGroup2(struct DefFrameData* pFrame, BYTE destMAC,BYTE serverCode, BYTE config)
+static BOOL MakeUnconnectVisibleRequestMessageOnlyGroup2(struct DefFrameData* pFrame, BYTE destMAC,BYTE serverCode, BYTE config)
 {
    if ((pFrame->len >= 6) && (pFrame->complteFlag == 0))
    {
@@ -215,6 +265,7 @@ BOOL MakeUnconnectVisibleRequestMessageOnlyGroup2(struct DefFrameData* pFrame, B
        pFrame->pBuffer[5] = DeviceNetObj.MACID & 0x3F;
        pFrame->len = 6;
        pFrame->complteFlag = TRUE;
+       return TRUE;
    }
    return FALSE;
 }
@@ -303,7 +354,7 @@ BOOL CheckMACID(struct DefFrameData* pReciveFrame, struct DefFrameData* pSendFra
                 }
             }
         }
-        sendCount ++;        
+       
     }
     while(++sendCount < 2);
     
@@ -318,7 +369,19 @@ BOOL CheckMACID(struct DefFrameData* pReciveFrame, struct DefFrameData* pSendFra
  */
 void SendData(struct DefFrameData* pFrame)
 {
-    // CANSendData(pFrame->ID, pFrame->pBuffer, pFrame->len);
+    for(USINT i = 0; i < pFrame->len; i++)
+    {
+        CAN_TxMsg[1].data[i] = pFrame->pBuffer[i];
+    }
+    
+    
+    CAN_TxMsg[1].id = pFrame->ID;    
+	CAN_TxMsg[1].len =  pFrame->len;
+	CAN_TxMsg[1].format = STANDARD_FORMAT;
+	CAN_TxMsg[1].type = DATA_FRAME;
+	CAN_waitReady (CAN2);  
+    CAN_wrMsg (CAN2, &CAN_TxMsg[1]);    
+    pFrame->complteFlag = 0;
 }
 
 /**
@@ -326,7 +389,8 @@ void SendData(struct DefFrameData* pFrame)
  */
 void StartOverTimer(void)
 {
-
+    msTicks = 0;
+     DelayTimeMS = 1000;
 }
 /**
  * 检测时间是否剩余 
@@ -336,7 +400,15 @@ void StartOverTimer(void)
  */
 BYTE IsTimeRemain(void)
 {
-    return FALSE;
+    if (DelayTimeMS > msTicks)
+    {
+         return TRUE;
+    }
+    else
+    {
+        return FALSE;
+    }
+   
 }
 
 /**
@@ -352,14 +424,14 @@ BYTE IsTimeRemain(void)
  */
 BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
 {   
-    BYTE i= 0;
-
+    //BYTE i= 0;
+    //UINT id = (*pID);
    
     if (((*pID) & 0x07C0) <= 0x3C0) //Group1
     {
         
     }
-    else if (((*pID) & 0x0600) == 0x04000) //Group2
+    else if (((*pID) & 0x0600) == 0x0400) //Group2
     {
         BYTE  mac = GET_GROUP2_MAC(*pID);
         //从站显示应答服务
@@ -393,23 +465,7 @@ BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
 
     
     
-    if( DeviceNetReciveFrame.complteFlag) //
-    {
-        return FALSE;
-    }
-    
    
-    if (len <= 8) //最大长度限制
-    {
-         DeviceNetReciveFrame.ID = *pID;   
-         DeviceNetReciveFrame.len = len;
-        for(i = 0; i< len; i++) //复制数据
-        {
-            DeviceNetReciveFrame.pBuffer[i] = pbuff[i];
-        }
-         DeviceNetReciveFrame.complteFlag = 0xff;
-         return TRUE;
-    }
     return 0;
 }
 

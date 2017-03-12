@@ -19,7 +19,7 @@
 #include "DeviceIO.h"
 #include "CAN.h"
 #include "timer.h"
-
+#include "DeviceNet.h"
 //#define PLL0CFG_Val           0x00050063  MSEL0    M= 99  N= 5  Fcco = 400M
 //#define CCLKCFG_Val           0x00000003   4       CPU时钟 100M = 400/4
 
@@ -27,19 +27,20 @@ volatile uint32_t msTicks;                            /* counts 1ms timeTicks */
 /*----------------------------------------------------------------------------
   SysTick_Handler
  *----------------------------------------------------------------------------*/
-void SysTick_Handler(void) {
+void SysTick_Handler(void)
+{
   msTicks++;                        /* increment counter necessary in Delay() */
 }
 
 /*------------------------------------------------------------------------------
   delays number of tick Systicks (happens every 1 ms)
  *------------------------------------------------------------------------------*/
-__INLINE static void Delay (uint32_t dlyTicks) {
-  uint32_t curTicks;
+//__INLINE static void Delay (uint32_t dlyTicks) {
+//  uint32_t curTicks;
 
-  curTicks = msTicks;
-  while ((msTicks - curTicks) < dlyTicks);
-}
+//  curTicks = msTicks;
+//  while ((msTicks - curTicks) < dlyTicks);
+//}
 
  /*----------------------------------------------------------------------------
   initialize CAN interface
@@ -51,19 +52,10 @@ void CanInit (void)
 
   CAN_setup (CAN2);                                  /* setup CAN Controller #2 */
  
-  CAN_wrFilter(CAN2,  33, STANDARD_FORMAT);          /* Enable recep                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-  LPC_CANAF->AFMR |= 0x00000002;  //接收滤波器处于旁路模式
-      
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          tion of messages */
-
- // CAN_start (1);                                  /* start CAN Controller #2 */
+  CAN_wrFilter(CAN2,  33, STANDARD_FORMAT);          /* Enable recep   */                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+  LPC_CANAF->AFMR |= 0x00000002;       //接收滤波器处于旁路模式             
   CAN_start (CAN2);                                  /* start CAN Controller #2 */
-
- // CAN_waitReady (1);                              /* wait til tx mbx is empty */
   CAN_waitReady (CAN2);                              /* wait til tx mbx is empty */
-
-
 }
 
 
@@ -84,8 +76,7 @@ int main (void)
 
   LedInit();                         
   CanInit();
-  while(1) 
-  {
+ 
   	//Led1On();
 	//Led2Off();
 	Led1Set(led1);
@@ -96,7 +87,7 @@ int main (void)
 	//Led1Off();
 //	Led1Set(0);
 //	Led2Set(1);
-	Delay (1000);
+	
    // delayMs(1, 500);
 
 	CAN_TxMsg[1].data[0] = i++;
@@ -107,16 +98,20 @@ int main (void)
 	CAN_TxMsg[1].type = DATA_FRAME;
 	CAN_waitReady (CAN2);   
     
-	if (CAN_TxRdy[1])
-	{
-        led2 = 1 - led2;
-	    CAN_TxRdy[1] = 0;
-		CAN_wrMsg (CAN2, &CAN_TxMsg[1]);               /* transmit message */
-	}
-
-  }
-
-       
+    
+    InitDeviceNet();//初始化DeviceNet
+    
+    
+    
+    while(1);
+//	if (CAN_TxRdy[1])
+//	{
+//        led2 = 1 - led2;
+//	    CAN_TxRdy[1] = 0;
+//		CAN_wrMsg (CAN2, &CAN_TxMsg[1]);               /* transmit message */
+//	}
+    
+  
   
 }
 

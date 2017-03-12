@@ -199,7 +199,7 @@ struct DefFrameData
 #define GET_GROUP_NUM(id)  ((((id) >> 9))&0x0003)
 //获取仅组2MAC地址 id为16bit 
 #define GET_GROUP2_MAC(id)   ( (((id) >> 3))&0x003F )
-#define GET_GROUP2_FUNCTION(id)  ((id)&0x0003 ) 
+#define GET_GROUP2_FUNCTION(id)  ((id)&0x0007 ) 
 
 #define GROUP2_MSG 2 //组2报文 
 
@@ -238,7 +238,7 @@ struct DefStationElement
 
 
 //////////////供其他模块调用的函数///////////////
-extern void CANFrameFilter(struct DefFrameData * pReciveBuf, struct DefFrameData * pSendBuf);
+
 extern unsigned char CheckMACID(struct DefFrameData* pReciveFrame, struct DefFrameData* pSendFrame);
 extern void DeviceMonitorPluse(void);
 extern BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len);

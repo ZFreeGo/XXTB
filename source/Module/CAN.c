@@ -13,6 +13,8 @@
 ************************************************************/
 #include <LPC17xx.H> 
 #include "CAN.h"
+#include "DeviceNet.h"
+
 
 CAN_msg       CAN_TxMsg[2];                      /* CAN message for sending */
 CAN_msg       CAN_RxMsg[2];                      /* CAN message for receiving */                                
@@ -22,7 +24,6 @@ unsigned int  CAN_RxRdy[2] = {0,0};              /* CAN HW received a message */
 
 
 #define  PCLK            (SystemCoreClock / 4)         /* Peripheral clock, depends on VPBDIV */
-
 /* Values of bit time register for different baudrates
    NT = Nominal bit time = TSEG1 + TSEG2 + 3
    SP = Sample point     = ((TSEG2 +1) / (TSEG1 + TSEG2 + 3)) * 100%
@@ -393,6 +394,9 @@ void CAN_IRQHandler (void)
     LPC_CAN2->CMR = (1 << 2);                    /* Release receive buffer */
 
     CAN_RxRdy[1] = 1;                            /*  set receive flag */
+    
+    DeviceNetReciveCenter(&(CAN_RxMsg[1].id), CAN_RxMsg[1].data, CAN_RxMsg[1].len);
+      
   }
 
   if (icr & (1 << 1)) {                          /* CAN Controller #2 meassage is transmitted */

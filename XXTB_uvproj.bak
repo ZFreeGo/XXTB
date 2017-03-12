@@ -364,7 +364,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\source\DeviceIO;.\source;.\source\CAN;.\source\DeviceNet</IncludePath>
+              <IncludePath>.\source;.\source\DeviceNet;.\source\Module</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -440,72 +440,12 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>DeviceIO</GroupName>
-          <Files>
-            <File>
-              <FileName>DeviceIO.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\DeviceIO\DeviceIO.h</FilePath>
-            </File>
-            <File>
-              <FileName>DeviceIO.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\DeviceIO\DeviceIO.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>App</GroupName>
           <Files>
             <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\source\App\main.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>485</GroupName>
-          <Files>
-            <File>
-              <FileName>UART.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\485\UART.c</FilePath>
-            </File>
-            <File>
-              <FileName>UART.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\485\UART.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>CAN</GroupName>
-          <Files>
-            <File>
-              <FileName>CAN.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\CAN\CAN.c</FilePath>
-            </File>
-            <File>
-              <FileName>CAN.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\CAN\CAN.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>RTC</GroupName>
-          <Files>
-            <File>
-              <FileName>rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\RTC\rtc.c</FilePath>
-            </File>
-            <File>
-              <FileName>rtc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\RTC\rtc.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -521,6 +461,71 @@
               <FileName>DeviceNet.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\source\DeviceNet\DeviceNet.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ReadMe</GroupName>
+          <Files>
+            <File>
+              <FileName>ReadMe.txt</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\source\ReadMe.txt</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Module</GroupName>
+          <Files>
+            <File>
+              <FileName>CAN.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\Module\CAN.c</FilePath>
+            </File>
+            <File>
+              <FileName>CAN.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\source\Module\CAN.h</FilePath>
+            </File>
+            <File>
+              <FileName>DeviceIO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\Module\DeviceIO.c</FilePath>
+            </File>
+            <File>
+              <FileName>DeviceIO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\source\Module\DeviceIO.h</FilePath>
+            </File>
+            <File>
+              <FileName>rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\Module\rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\source\Module\rtc.h</FilePath>
+            </File>
+            <File>
+              <FileName>UART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\Module\UART.c</FilePath>
+            </File>
+            <File>
+              <FileName>UART.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\source\Module\UART.h</FilePath>
+            </File>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\Module\timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>timer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\source\Module\timer.h</FilePath>
             </File>
           </Files>
         </Group>
