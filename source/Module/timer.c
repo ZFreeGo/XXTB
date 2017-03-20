@@ -14,6 +14,7 @@
 volatile uint32_t timer0_counter = 0;
 volatile uint32_t timer1_counter = 0;
 
+volatile uint32_t g_MsTicks;                            /* counts 1ms timeTicks */
 /*****************************************************************************
 ** Function name:		delayMs
 **
@@ -200,6 +201,61 @@ uint32_t init_timer ( uint8_t timer_num, uint32_t TimerInterval )
   }
   return (0);
 }
+
+
+
+/*----------------------------------------------------------------------------
+  SysTick_Handler
+ *----------------------------------------------------------------------------*/
+void SysTick_Handler(void)
+{
+  g_MsTicks++;                        /* increment counter necessary in Delay() */
+}
+
+/**
+ * 判断时间是否超时
+ *
+ * @param   startTime 启动时间
+ * @param   delayTime 延时时间
+ * 
+ * @return  0xFF-时间到达 0-时间还未到达
+ *
+ * @bref   比较时间是否达到设定值，对溢出进行超时判断
+ */
+inline uint8_t IsOverTime(uint32_t startTime, uint32_t delayTime)
+{
+    if (UINT32_MAX - delayTime < startTime) //判断是否溢出,若溢出则进行则先判断是否超出一个周期
+    {
+         if( g_MsTicks < startTime)//先判断是否小于startTime
+         {
+             if (g_MsTicks >= (delayTime + startTime))
+             {
+                 return 0xFF;
+             }
+         }
+    }
+    else
+    {
+        if (g_MsTicks >= startTime)
+        {
+            return 0xFF;
+        }                
+    }
+    return 0;
+}
+
+
+/*------------------------------------------------------------------------------
+  delays number of tick Systicks (happens every 1 ms)
+ *------------------------------------------------------------------------------*/
+//__INLINE static void Delay (uint32_t dlyTicks) {
+//  uint32_t curTicks;
+
+//  curTicks = msTicks;
+//  while ((msTicks - curTicks) < dlyTicks);
+//}
+
+
 
 /******************************************************************************
 **                            End Of File

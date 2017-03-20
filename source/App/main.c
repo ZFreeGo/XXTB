@@ -20,27 +20,11 @@
 #include "CAN.h"
 #include "timer.h"
 #include "DeviceNet.h"
+
+
 //#define PLL0CFG_Val           0x00050063  MSEL0    M= 99  N= 5  Fcco = 400M
 //#define CCLKCFG_Val           0x00000003   4       CPU时钟 100M = 400/4
 
-volatile uint32_t msTicks;                            /* counts 1ms timeTicks */
-/*----------------------------------------------------------------------------
-  SysTick_Handler
- *----------------------------------------------------------------------------*/
-void SysTick_Handler(void)
-{
-  msTicks++;                        /* increment counter necessary in Delay() */
-}
-
-/*------------------------------------------------------------------------------
-  delays number of tick Systicks (happens every 1 ms)
- *------------------------------------------------------------------------------*/
-//__INLINE static void Delay (uint32_t dlyTicks) {
-//  uint32_t curTicks;
-
-//  curTicks = msTicks;
-//  while ((msTicks - curTicks) < dlyTicks);
-//}
 
  /*----------------------------------------------------------------------------
   initialize CAN interface
@@ -98,18 +82,12 @@ int main (void)
 	CAN_TxMsg[1].type = DATA_FRAME;
 	CAN_waitReady (CAN2);   
     
-    
-    InitDeviceNet();//初始化DeviceNet
-    
-    
-    
-    while(1);
-//	if (CAN_TxRdy[1])
-//	{
-//        led2 = 1 - led2;
-//	    CAN_TxRdy[1] = 0;
-//		CAN_wrMsg (CAN2, &CAN_TxMsg[1]);               /* transmit message */
-//	}
+    while(TRUE)
+    {
+        InitDeviceNet();//初始化DeviceNet
+        
+    }
+
     
   
   

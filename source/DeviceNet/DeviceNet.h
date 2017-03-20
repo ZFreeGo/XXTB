@@ -213,8 +213,28 @@ struct DefFrameData
 #define FALSE (BYTE)0
 #define TRUE (BYTE)0xFF
 
-
-//站点要素定义体
+/**
+ * 站点状态属性
+ */
+struct DefStationInformation 
+{
+    USINT macId; //站点MAC
+    USINT state;  //站点配置状态--已经建立的连接    
+    BOOL  online; //在线标志 TRUE--在线， OFF--离线
+    USINT step; //处理步骤
+    
+    BOOL complete; //TRUE-完成 FALSE-失败完成标志
+    
+    UDINT delayTime; //延时时间
+    UDINT startTime; //启动时间
+    UDINT endTime; //结束时间
+    
+    USINT OverTimeCount;//超时次数
+    
+};
+/**
+ *站点要素定义体
+ */
 struct DefStationElement
 {
      struct DefIdentifierObject  *pIdentifier; //执行标识符对象的指针
@@ -230,8 +250,11 @@ struct DefStationElement
      struct DefFrameData        *pRecive;   //指向接收报文的指针
      
      //应用对象
-    
+    struct DefStationInformation StationInformation;
 };
+
+
+#define STATION_COUNT  7 //站点数量
 
 
 
@@ -243,8 +266,9 @@ extern unsigned char CheckMACID(struct DefFrameData* pReciveFrame, struct DefFra
 extern void DeviceMonitorPluse(void);
 extern BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len);
 extern void InitDeviceNet(void);
-//////////////供其他模块调用的变量/////////////////
+extern void DeviceNetTask(void);
 
+extern void MainDeviceNetTask(void);
 
 
 #ifdef	__cplusplus

@@ -12,6 +12,14 @@
 #include <LPC17xx.H> 
 #include "DeviceNet.h"
 #include "can.h"
+#include "timer.h"
+
+#define STEP_START        0xA1 //启动状态,上电初始状态
+#define STEP_LINKING      0xA2 //正在建立连接中
+#define STEP_CYCLE        0xA4 //循环模式
+
+
+
 
 BOOL IsTimeRemain(void);    //需要根据具体平台改写
 void StartOverTimer(void);//需要根据具体平台改写
@@ -20,7 +28,7 @@ void ResponseMACID(struct DefFrameData* pSendFrame, BYTE config);
 void InitYongciAData(void);
 static BOOL MakeUnconnectVisibleRequestMessageOnlyGroup2(struct DefFrameData* pFrame, 
     BYTE destMAC,BYTE serverCode, BYTE config);
-static void EstablishConnection(void);
+static void EstablishConnection(struct DefStationElement* pStation, USINT connectType);
 
 ////////////////////////////////////////////////////////////可考虑存入EEPROM
 UINT  providerID = 0X1234;               // 供应商ID 
@@ -66,6 +74,12 @@ BYTE  YongciA_SendBufferData[10];//接收缓冲数据
 struct DefFrameData  YongciA_ReciveFrame; //接收帧处理
 struct DefFrameData  YongciA_SendFrame; //接收帧处理
 
+/**
+ *  列表中对应的子站列表
+ */
+static struct DefStationElement StationList[STATION_COUNT];
+
+
 
 /**
  * 当前处理所指向的子站指针
@@ -73,12 +87,15 @@ struct DefFrameData  YongciA_SendFrame; //接收帧处理
 struct DefStationElement*    g_pCurrrentStation; 
 
 
+
 /**
  * 引用外部变量
  */
-extern volatile uint32_t msTicks;
-static uint32_t DelayTimeMS;
+ /**
+  *MS计数
+  */
 
+static uint32_t DelayTimeMS;
 
 /**
  * 初始化YongciA 所涉及的基本数据
@@ -108,7 +125,7 @@ void InitYongciAData(void)
 /**
  * 初始化DeviceNet所涉及的基本数据
  */
-void InitDeviceNet()
+void InitDeviceNet(void)
 {    
     DeviceNetReciveFrame.complteFlag = 0xff;
     DeviceNetReciveFrame.waitFlag = 0;
@@ -148,12 +165,21 @@ void InitDeviceNet()
     
     g_pCurrrentStation = &YongciA_Station;
     
+    
+    
+    
+    
     BOOL result =  CheckMACID(&DeviceNetReciveFrame, &DeviceNetSendFrame);
     
     while(result);
-    EstablishConnection();
+    
+   // EstablishConnection();
     
 }
+
+
+
+
 /**
  * 通过仅限组2显示信息服务建立连接
  *
@@ -161,25 +187,110 @@ void InitDeviceNet()
  *
  * @bref   建立连接
  */
-static void EstablishConnection(void)
+static void EstablishConnection(struct DefStationElement* pStation, USINT connectType)
 {
     //建立显示连接
-    BOOL result =  MakeUnconnectVisibleRequestMessageOnlyGroup2(g_pCurrrentStation->pSend, g_pCurrrentStation->pDeviceNetObj->MACID,
-    SVC_AllOCATE_MASTER_SlAVE_CONNECTION_SET, VISIBLE_MSG);
+    BOOL result =  MakeUnconnectVisibleRequestMessageOnlyGroup2( pStation->pSend,  pStation->pDeviceNetObj->MACID,
+    SVC_AllOCATE_MASTER_SlAVE_CONNECTION_SET, connectType);
     if (result)
     {
-        SendData(g_pCurrrentStation->pSend);
+        SendData( pStation->pSend);
+        pStation->pSend->waitFlag = TRUE;
     }
     else
     {
         while(TRUE);
+    }  
+}
+
+/**
+ * 单个支线任务
+ *
+ * @param   pStation 指向站点信息
+ *
+ * @bref   建立连接
+ */
+static void NormalTask(struct DefStationElement* pStation)
+{
+    if ( pStation->StationInformation.complete)//若已经完成任务则致0
+    {
+        pStation->StationInformation.OverTimeCount = 0;
+    }
+    else
+    {
+         pStation->StationInformation.OverTimeCount++;
     }
     
+    pStation->StationInformation.complete = FALSE;
+    pStation->StationInformation.startTime = g_MsTicks; 
+    pStation->StationInformation.delayTime = 500;//500mS超时间
+    pStation->pSend->complteFlag = 0; //可以使用
+    pStation->pSend->waitFlag = 0; //等在应答
+    switch(pStation->StationInformation.step)
+    {
+        case STEP_START: //启动开始
+        {
+            
+            EstablishConnection(pStation, VISIBLE_MSG);
+          
+            break;
+        }
+        case STEP_LINKING: //正在建立连接
+        {
+            EstablishConnection(pStation, CYC_INQUIRE);
+            break;
+        }
+        case STEP_CYCLE: //循环建立连接
+        {
+            break;
+        }
+    }   
+}
 
+/**
+ * 通讯主任务
+ *
+ * @param   pStation 指向站点信息
+ *
+ * @bref   建立连接
+ */
+void MainDeviceNetTask(void)
+{
+    for(USINT i = 0; i < STATION_COUNT; i++)
+    {
+//        if(StationList[i].StationInformation.complete == TRUE)//是否完成
+//        {
+//            NormalTask(StationList + i);
+//        }
+        //是否超时，若超时则执行后续任务。
+          if (IsOverTime(StationList[i].StationInformation.startTime, StationList[i].StationInformation.delayTime) )
+          {
+              NormalTask(StationList + i);
+          }
+        
+    }
 }
 
 
-
+/**
+ * 获取站点指针
+ *
+ * @param   macID 站点MAC地址
+ *
+ * @bref   通过站点MACID获取相应的站点信息指针，没有则返回<code>null</code>
+ */
+static struct DefStationElement* GetStationPoint(USINT macID)
+{
+    for (USINT i =0 ; i < STATION_COUNT; i++)
+    {
+        if (StationList[i].StationInformation.macId == macID)
+        {
+            return &StationList[i];
+        }
+            
+    }
+    return 0;
+}
 
 /**
  * 从站显示信息应答报文处理函数
@@ -189,11 +300,18 @@ static void EstablishConnection(void)
  */
 static void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
 {  
-    if (!g_pCurrrentStation->pSend->waitFlag)//判断是否为等待
+    struct DefStationElement* pStation = GetStationPoint(GET_GROUP2_MAC(*pID));
+    if (pStation == 0)
+    {
+        //报错
+        return;
+    }
+    //g_pCurrrentStation = pStation;
+    if (!pStation->pSend->waitFlag)//判断是否为等待
     {
         return;
     }
-    if (g_pCurrrentStation->pDeviceNetObj->MACID != *pID) //判断是目的MAC与本机是否一致
+    if (pStation->pDeviceNetObj->MACID != GET_GROUP2_MAC(*pID)) //判断是目的MAC与本机是否一致
     {
         return;
     }
@@ -202,7 +320,7 @@ static void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
         return;
     }
     //判断服务代码是否是对应的应答代码,或者错误响应代码
-    if (((g_pCurrrentStation->pSend->pBuffer[1] |0x80) != pbuff[1]) || (pbuff[1] == (0x80 | SVC_ERROR_RESPONSE)))
+    if (((pStation->pSend->pBuffer[1] |0x80) != pbuff[1]) || (pbuff[1] == (0x80 | SVC_ERROR_RESPONSE)))
 	{
         return;
     }
@@ -212,28 +330,53 @@ static void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
     }
     for(USINT i = 0; i < len; i++)
     {
-        g_pCurrrentStation->pRecive->pBuffer[i] = pbuff[i];
+        pStation->pRecive->pBuffer[i] = pbuff[i];
     }
-    g_pCurrrentStation->pRecive->ID = *pID;
-    g_pCurrrentStation->pRecive->len = len;
+    pStation->pRecive->ID = *pID;
+    pStation->pRecive->len = len;
     
-    switch (g_pCurrrentStation->pRecive->pBuffer[1] & 0x7F)
+    switch (pStation->pRecive->pBuffer[1] & 0x7F)
     {
         case SVC_AllOCATE_MASTER_SlAVE_CONNECTION_SET://建立主从连接          
         {
+            //配置连接字
+            pStation->StationInformation.state |=  pStation->pSend->pBuffer[5];             
+            
+            if (pStation->StationInformation.state & CYC_INQUIRE) //若建立轮询连接则进入轮询连接建立步骤
+            {
+                pStation->StationInformation.step = STEP_CYCLE;
+                pStation->pSend->waitFlag = FALSE;
+                pStation->StationInformation.endTime = g_MsTicks; //设置结束时间
+                pStation->StationInformation.complete = TRUE;
+            }
+            else if (pStation->StationInformation.state & VISIBLE_MSG) //若建立显示连接则进入轮询连接建立步骤
+            {
+                pStation->StationInformation.step = STEP_LINKING;
+                pStation->pSend->waitFlag = FALSE;
+                pStation->StationInformation.endTime = g_MsTicks;//设置结束时间
+                pStation->StationInformation.complete = TRUE;
+            }
+            else
+            {
+                //报错
+            }
             
             break;
         }
         case SVC_RELEASE_GROUP2_IDENTIFIER_SET://释放主从连接 
         {
-            break;
+            //配置连接字
+            pStation->StationInformation.state &=  (pStation->pSend->pBuffer[5]^ 0xFF); 
+            break;           
         }
         case SVC_GET_ATTRIBUTE_SINGLE: //获取单个属性
         {
+            //发送获取消息
             break;
         }
-        case SVC_SET_ATTRIBUTE_SINGLE: //获取单个属性
+        case SVC_SET_ATTRIBUTE_SINGLE: //设置单个属性
         {
+            //发送设置消息
             break;
         }
        
@@ -353,8 +496,7 @@ BOOL CheckMACID(struct DefFrameData* pReciveFrame, struct DefFrameData* pSendFra
                     continue;
                 }
             }
-        }
-       
+        }       
     }
     while(++sendCount < 2);
     
@@ -389,8 +531,8 @@ void SendData(struct DefFrameData* pFrame)
  */
 void StartOverTimer(void)
 {
-    msTicks = 0;
-     DelayTimeMS = 1000;
+    g_MsTicks = 0;
+    DelayTimeMS = 1000;
 }
 /**
  * 检测时间是否剩余 
@@ -400,7 +542,7 @@ void StartOverTimer(void)
  */
 BYTE IsTimeRemain(void)
 {
-    if (DelayTimeMS > msTicks)
+    if (DelayTimeMS > g_MsTicks)
     {
          return TRUE;
     }
@@ -440,7 +582,12 @@ BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
             case GROUP2_VISIBLE_UCN: //从站显示响应服务
             {
                 if (len >= 2)
-                SlaveStationVisibleMsgService(pID, pbuff, len);
+                {
+                    
+                   
+                        SlaveStationVisibleMsgService(pID, pbuff, len);
+                                                      
+                }
                 break;
             }
             case GROUP2_REPEAT_MACID: //从站响应MAC ID重复检测
@@ -453,6 +600,18 @@ BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
                     }
                     ResponseMACID(MasterStation.pSend, 0x80);       //重复MACID检查响应函数,应答，物理端口为0
                 }
+                else
+                {
+                     for(USINT i = 0; i < STATION_COUNT; i++)
+                    {
+                        if(StationList[i].StationInformation.macId== mac)
+                        {
+                            StationList[i].StationInformation.online = TRUE;
+                            StationList[i].StationInformation.state = 0;
+                        }
+                    }
+                }
+               
                 break;
             }
         }

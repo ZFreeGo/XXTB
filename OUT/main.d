@@ -9,3 +9,4 @@
 .\out\main.o: .\source\Module\DeviceIO.h
 .\out\main.o: .\source\Module\CAN.h
 .\out\main.o: .\source\Module\timer.h
+.\out\main.o: .\source\DeviceNet\DeviceNet.h
