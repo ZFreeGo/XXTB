@@ -218,7 +218,7 @@ struct DefFrameData
  */
 struct DefStationInformation 
 {
-    USINT macId; //站点MAC
+    USINT macID; //站点MAC
     USINT state;  //站点配置状态--已经建立的连接    
     BOOL  online; //在线标志 TRUE--在线， OFF--离线
     USINT step; //处理步骤
@@ -237,24 +237,24 @@ struct DefStationInformation
  */
 struct DefStationElement
 {
-     struct DefIdentifierObject  *pIdentifier; //执行标识符对象的指针
-     struct DefDeviceNetClass    *pDeviceNetClass; //执行对象类的指针
-     struct DefDeviceNetObj      *pDeviceNetObj;  //指向DeviceNet对象的指针
+//     struct DefIdentifierObject  *pIdentifier; //执行标识符对象的指针
+//     struct DefDeviceNetClass    *pDeviceNetClass; //执行对象类的指针
+//     struct DefDeviceNetObj      *pDeviceNetObj;  //指向DeviceNet对象的指针
+//    
+//     struct DefConnectionObj     *pVisibleConnection;  //指向显示连接的指针
+//     struct DefConnectionObj     *pIOCyclePollCommandConnection;       //指向IO轮询命令连接的指针,可以为空
+//     struct DefConnectionObj     *pStatusChangeCycleConnection;  //指向状态变换/循环报文连接的指针,可以为空
+//     struct DefConnectionObj     *pIOBitStrobeConnection;  //指向IO位选通连接的指针,可以为空
     
-     struct DefConnectionObj     *pVisibleConnection;  //指向显示连接的指针
-     struct DefConnectionObj     *pIOCyclePollCommandConnection;       //指向IO轮询命令连接的指针,可以为空
-     struct DefConnectionObj     *pStatusChangeCycleConnection;  //指向状态变换/循环报文连接的指针,可以为空
-     struct DefConnectionObj     *pIOBitStrobeConnection;  //指向IO位选通连接的指针,可以为空
-    
-     struct DefFrameData        *pSend;     //指向发送报文的指针
-     struct DefFrameData        *pRecive;   //指向接收报文的指针
+     struct DefFrameData        SendFrame;     //指向发送报文的指针
+     struct DefFrameData        ReciveFrame;   //指向接收报文的指针
      
      //应用对象
     struct DefStationInformation StationInformation;
 };
 
 
-#define STATION_COUNT  7 //站点数量
+#define STATION_COUNT  6//站点数量
 
 
 

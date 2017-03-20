@@ -8,38 +8,66 @@ Project File Date:  03/12/2017
 
 <h2>Output:</h2>
 Build target 'CommunicationManagement'
-compiling main.c...
 compiling DeviceNet.c...
-compiling CAN.c...
 linking...
-Program Size: Code=5648 RO-data=304 RW-data=96 ZI-data=1656  
+Program Size: Code=5848 RO-data=304 RW-data=84 ZI-data=1372  
 ".\OUT\XXTB.axf" - 0 Error(s), 0 Warning(s).
 </pre>
 </body>
 </html>
-DeviceNet\DeviceNet.c: 1 warning, 0 errors
-compiling CAN.c...
+e\DeviceNet\DeviceNet.c: 1 warning, 0 errors
 linking...
-Program Size: Code=5624 RO-data=304 RW-data=96 ZI-data=1656  
+Program Size: Code=5848 RO-data=304 RW-data=88 ZI-data=1376  
 ".\OUT\XXTB.axf" - 0 Error(s), 1 Warning(s).
-declared but never referenced
-  static void NormalTask(struct DefStationElement* pStation)
-source\DeviceNet\DeviceNet.c(247): warning:  #177-D: function "MainCommunicationTask" was declared but never referenced
-  static void MainCommunicationTask()
-source\DeviceNet\DeviceNet.c: 2 warnings, 2 errors
-compiling CAN.c...
-compiling DeviceIO.c...
-compiling rtc.c...
-compiling UART.c...
-compiling timer.c...
-".\OUT\XXTB.axf" - 2 Error(s), 2 Warning(s).
+macId"
+      BOOL result =  MakeUnconnectVisibleRequestMessageOnlyGroup2( pStation->pSend,  pStation->StationInformation.macId,
+source\DeviceNet\DeviceNet.c(231): error:  #136: struct "DefStationElement" has no field "pSend"
+          SendData( pStation->pSend);
+source\DeviceNet\DeviceNet.c(316): error:  #136: struct "DefStationInformation" has no field "macId"
+          if (StationList[i].StationInformation.macId == macID)
+source\DeviceNet\DeviceNet.c(627): error:  #136: struct "DefStationElement" has no field "pSend"
+                      if( MasterStation.pSend->complteFlag) //检测是否被占用
+source\DeviceNet\DeviceNet.c(631): error:  #136: struct "DefStationElement" has no field "pSend"
+                      ResponseMACID(MasterStation.pSend, 0x80);       //重复MACID检查响应函�?应答，物理端口为0
+source\DeviceNet\DeviceNet.c(637): error:  #136: struct "DefStationInformation" has no field "macId"
+                          if(StationList[i].StationInformation.macId== mac)
+source\DeviceNet\DeviceNet.c: 0 warnings, 7 errors
+".\OUT\XXTB.axf" - 7 Error(s), 0 Warning(s).
 Target not created
-mpiling CAN.c...
-".\OUT\XXTB.axf" - 3 Error(s), 2 Warning(s).
+ct "DefStationElement" has no field "pRecive"
+          pStation->pRecive->pBuffer[i] = pbuff[i];
+source\DeviceNet\DeviceNet.c(365): error:  #136: struct "DefStationElement" has no field "pRecive"
+      pStation->pRecive->ID = *pID;
+source\DeviceNet\DeviceNet.c(366): error:  #136: struct "DefStationElement" has no field "pRecive"
+      pStation->pRecive->len = len;
+source\DeviceNet\DeviceNet.c(368): error:  #136: struct "DefStationElement" has no field "pRecive"
+      switch (pStation->pRecive->pBuffer[1] & 0x7F)
+source\DeviceNet\DeviceNet.c(373): error:  #136: struct "DefStationElement" has no field "pSend"
+              pStation->StationInformation.state |=  pStation->pSend->pBuffer[5];             
+source\DeviceNet\DeviceNet.c(378): error:  #136: struct "DefStationElement" has no field "pSend"
+                  pStation->pSend->waitFlag = FALSE;
+source\DeviceNet\DeviceNet.c(385): error:  #136: struct "DefStationElement" has no field "pSend"
+                  pStation->pSend->waitFlag = FALSE;
+source\DeviceNet\DeviceNet.c(399): error:  #136: struct "DefStationElement" has no field "pSend"
+              pStation->StationInformation.state &=  (pStation->pSend->pBuffer[5]^ 0xFF); 
+source\DeviceNet\DeviceNet.c(627): error:  #136: struct "DefStationElement" has no field "pSend"
+                      if( MasterStation.pSend->complteFlag) //检测是否被占用
+source\DeviceNet\DeviceNet.c(631): error:  #136: struct "DefStationElement" has no field "pSend"
+                      ResponseMACID(MasterStation.pSend, 0x80);       //重复MACID检查响应函�?应答，物理端口为0
+source\DeviceNet\DeviceNet.c(637): error:  #136: struct "DefStationInformation" has no field "macId"
+                          if(StationList[i].StationInformation.macId== mac)
+source\DeviceNet\DeviceNet.c: 0 warnings, 19 errors
+".\OUT\XXTB.axf" - 19 Error(s), 0 Warning(s).
 Target not created
-t.c(241): warning:  #177-D: function "MainTask" was declared but never referenced
-  static void MainTask()
-source\DeviceNet\DeviceNet.c: 2 warnings, 4 errors
+           if(StationList[i].StationInformation.macId== mac)
+source\DeviceNet\DeviceNet.c: 0 warnings, 20 errors
+".\OUT\XXTB.axf" - 20 Error(s), 0 Warning(s).
+Target not created
+onElement" has no field "pSend"
+                      ResponseMACID(MasterStation.pSend, 0x80);       //重复MACID检查响应函�?应答，物理端口为0
+source\DeviceNet\DeviceNet.c(627): error:  #136: struct "DefStationInformation" has no field "macId"
+                          if(StationList[i].StationInformation.macId== mac)
+source\DeviceNet\DeviceNet.c: 0 warnings, 23 errors
 compiling CAN.c...
-".\OUT\XXTB.axf" - 4 Error(s), 2 Warning(s).
+".\OUT\XXTB.axf" - 23 Error(s), 0 Warning(s).
 Target not created

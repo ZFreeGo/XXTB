@@ -51,28 +51,25 @@ struct DefIdentifierObject  IdentifierObj;
 
 BYTE  SendBufferData[10];//接收缓冲数据
 BYTE  ReciveBufferData[10];//接收缓冲数据
-struct DefFrameData  DeviceNetReciveFrame; //接收帧处理
-struct DefFrameData  DeviceNetSendFrame; //接收帧处理
 
 struct DefStationElement MasterStation;  //主站
 
 
-/**
- * 永磁控制器A子站
- */
-struct DefStationElement    YongciA_Station; //永磁控制器A子站
 
-struct DefDeviceNetClass    YongciA_DeviceNetCDlass = {1}; //
-struct DefDeviceNetObj      YongciA_DeviceNetObj;
-struct DefIdentifierObject  YongciA_IdentifierObj; 
 
-struct DefConnectionObj     YongciA_IOCyclePollctionObj;//循环IO响应
-struct DefConnectionObj     YongciA_VisibleConnectionObj;   //显示连接
+static BYTE  ReceiveDataBuffer0[10] = {0}; //接收缓冲数据
+static BYTE  SendDataBuffer0[10] = {0};    //发送缓冲数据
+static BYTE  ReceiveDataBuffer1[10] = {0}; //接收缓冲数据
+static BYTE  SendDataBuffer1[10] = {0};    //发送缓冲数据
+static BYTE  ReceiveDataBuffer2[10] = {0}; //接收缓冲数据
+static BYTE  SendDataBuffer2[10] = {0};    //发送缓冲数据
+static BYTE  ReceiveDataBuffer3[10] = {0}; //接收缓冲数据
+static BYTE  SendDataBuffer3[10] = {0};    //发送缓冲数据
+static BYTE  ReceiveDataBuffer4[10] = {0}; //接收缓冲数据
+static BYTE  SendDataBuffer4[10] = {0};    //发送缓冲数据
+static BYTE  ReceiveDataBuffer5[10] = {0}; //接收缓冲数据
+static BYTE  SendDataBuffer5[10] = {0};    //发送缓冲数据
 
-BYTE  YongciA_ReciveBuffer[10];//接收缓冲数据
-BYTE  YongciA_SendBufferData[10];//接收缓冲数据
-struct DefFrameData  YongciA_ReciveFrame; //接收帧处理
-struct DefFrameData  YongciA_SendFrame; //接收帧处理
 
 /**
  *  列表中对应的子站列表
@@ -88,37 +85,66 @@ struct DefStationElement*    g_pCurrrentStation;
 
 
 
-/**
- * 引用外部变量
- */
- /**
-  *MS计数
-  */
-
-static uint32_t DelayTimeMS;
 
 /**
- * 初始化YongciA 所涉及的基本数据
+ * 初始化所涉及的基本数据
  */
-void InitYongciAData(void)
+static void InitSlaveStationData(void)
 {
-    YongciA_DeviceNetObj.MACID =0x02 ;                   //如果跳键没有设置从站地址，默认主站地址0x02      
+                       
     
-    YongciA_ReciveFrame.pBuffer = YongciA_ReciveBuffer;
-    YongciA_SendFrame.pBuffer = YongciA_ReciveBuffer;
+    StationList[0].ReciveFrame.len = 8;
+    StationList[0].ReciveFrame.pBuffer = ReceiveDataBuffer0;
+    StationList[0].SendFrame.len = 8;
+    StationList[0].SendFrame.pBuffer = SendDataBuffer0;
     
-    YongciA_Station.pDeviceNetObj = &YongciA_DeviceNetObj;
-    YongciA_Station.pIdentifier = &YongciA_IdentifierObj;
-    YongciA_Station.pRecive = &YongciA_ReciveFrame;
-    YongciA_ReciveFrame.len = 8;
-    YongciA_Station.pSend = &YongciA_SendFrame;
-    YongciA_SendFrame.len = 8;
+    StationList[1].ReciveFrame.len = 8;
+    StationList[1].ReciveFrame.pBuffer = ReceiveDataBuffer1;
+    StationList[1].SendFrame.len = 8;
+    StationList[1].SendFrame.pBuffer = SendDataBuffer1;
     
-    YongciA_Station.pDeviceNetClass = &YongciA_DeviceNetCDlass;
-    YongciA_Station.pVisibleConnection = &YongciA_VisibleConnectionObj;
-    YongciA_Station.pIOCyclePollCommandConnection = &YongciA_IOCyclePollctionObj;
-    YongciA_Station.pStatusChangeCycleConnection = 0;
-    YongciA_Station.pIOBitStrobeConnection = 0;
+    StationList[2].ReciveFrame.len = 8;
+    StationList[2].ReciveFrame.pBuffer = ReceiveDataBuffer2;
+    StationList[2].SendFrame.len = 8;
+    StationList[2].SendFrame.pBuffer = SendDataBuffer2;
+    
+    StationList[3].ReciveFrame.len = 8;
+    StationList[3].ReciveFrame.pBuffer = ReceiveDataBuffer3;
+    StationList[3].SendFrame.len = 8;
+    StationList[3].SendFrame.pBuffer = SendDataBuffer3;
+    
+    StationList[4].ReciveFrame.len = 8;
+    StationList[4].ReciveFrame.pBuffer = ReceiveDataBuffer4;
+    StationList[4].SendFrame.len = 8;
+    StationList[4].SendFrame.pBuffer = SendDataBuffer4;
+    
+    StationList[5].ReciveFrame.len = 8;
+    StationList[5].ReciveFrame.pBuffer = ReceiveDataBuffer5;
+    StationList[5].SendFrame.len = 8;
+    StationList[5].SendFrame.pBuffer = SendDataBuffer5;
+
+    
+
+    
+    for(USINT i =0; i < STATION_COUNT; i++)
+    {
+        StationList[i].StationInformation.step = STEP_START;
+        StationList[i].StationInformation.complete =TRUE;
+        StationList[i].StationInformation.startTime = 0;
+        StationList[i].StationInformation.delayTime = 0;
+        StationList[i].StationInformation.endTime = 0;
+        StationList[i].StationInformation.OverTimeCount = 0;
+        
+        StationList[i].StationInformation.online = 0;
+        StationList[i].StationInformation.state = 0;       
+    }
+     StationList[0].StationInformation.macID = 0x10; //永磁控制器A
+     StationList[1].StationInformation.macID = 0x12; //永磁控制器B
+     StationList[2].StationInformation.macID = 0x14; //永磁控制器C
+     StationList[3].StationInformation.macID = 0x18; //监控A
+     StationList[4].StationInformation.macID = 0x1A; //监控B
+     StationList[5].StationInformation.macID = 0x1C; //监控C
+
 }
 
 
@@ -127,12 +153,7 @@ void InitYongciAData(void)
  */
 void InitDeviceNet(void)
 {    
-    DeviceNetReciveFrame.complteFlag = 0xff;
-    DeviceNetReciveFrame.waitFlag = 0;
-    DeviceNetReciveFrame.pBuffer = ReciveBufferData;
-    DeviceNetSendFrame.complteFlag = 0xff;
-    DeviceNetSendFrame.pBuffer = SendBufferData;
-    DeviceNetSendFrame.waitFlag = 0;
+
   
     //////////初始化DeviceNetObj对象////////////////////////////////
 	DeviceNetObj.MACID =0x20 ;                   //如果跳键没有设置从站地址，默认主站地址0x02            
@@ -151,29 +172,36 @@ void InitDeviceNet(void)
 	IdentifierObj.serialID = serialID;            //serialID = 0x001169BC;;序列号
 	IdentifierObj.product_name = product_name;    //product_name = {8, "ADC4"};产品名称
     
-    MasterStation.pDeviceNetObj = &DeviceNetObj;
-    MasterStation.pIdentifier = &IdentifierObj;
-    MasterStation.pRecive = &DeviceNetReciveFrame;
-    MasterStation.pSend = &DeviceNetSendFrame;
-    MasterStation.pDeviceNetClass = 0;
-    MasterStation.pVisibleConnection = 0;
-    MasterStation.pIOCyclePollCommandConnection = 0;
-    MasterStation.pStatusChangeCycleConnection = 0;
-    MasterStation.pIOBitStrobeConnection = 0;
     
-    InitYongciAData();
+    MasterStation.ReciveFrame.complteFlag = 0xff;
+    MasterStation.ReciveFrame.waitFlag = 0;
+    MasterStation.ReciveFrame.pBuffer = ReciveBufferData;
+    MasterStation.SendFrame.complteFlag = 0xff;
+    MasterStation.SendFrame.pBuffer = SendBufferData;
+    MasterStation.SendFrame.waitFlag = 0;
     
-    g_pCurrrentStation = &YongciA_Station;
+    MasterStation.StationInformation.step = STEP_START;
+    MasterStation.StationInformation.complete =TRUE;
+    MasterStation.StationInformation.startTime = 0;
+    MasterStation.StationInformation.delayTime = 0;
+    MasterStation.StationInformation.endTime = 0;
+    MasterStation.StationInformation.OverTimeCount = 0;
+    
+    MasterStation.StationInformation.online = 0;
+    MasterStation.StationInformation.state = 0;   
+    StationList[0].StationInformation.macID = 0x02; //主站地址
+    
+
+    
+    InitSlaveStationData();
+    
+    g_pCurrrentStation = StationList; //当前指针变量指向从站第一站点
     
     
-    
-    
-    
-    BOOL result =  CheckMACID(&DeviceNetReciveFrame, &DeviceNetSendFrame);
+    BOOL result =  CheckMACID(&MasterStation.ReciveFrame, &MasterStation.SendFrame);
     
     while(result);
     
-   // EstablishConnection();
     
 }
 
@@ -190,12 +218,12 @@ void InitDeviceNet(void)
 static void EstablishConnection(struct DefStationElement* pStation, USINT connectType)
 {
     //建立显示连接
-    BOOL result =  MakeUnconnectVisibleRequestMessageOnlyGroup2( pStation->pSend,  pStation->pDeviceNetObj->MACID,
+    BOOL result =  MakeUnconnectVisibleRequestMessageOnlyGroup2( &pStation->SendFrame,  pStation->StationInformation.macID,
     SVC_AllOCATE_MASTER_SlAVE_CONNECTION_SET, connectType);
     if (result)
     {
-        SendData( pStation->pSend);
-        pStation->pSend->waitFlag = TRUE;
+        SendData( &pStation->SendFrame);
+        pStation->SendFrame.waitFlag = TRUE;
     }
     else
     {
@@ -224,8 +252,8 @@ static void NormalTask(struct DefStationElement* pStation)
     pStation->StationInformation.complete = FALSE;
     pStation->StationInformation.startTime = g_MsTicks; 
     pStation->StationInformation.delayTime = 500;//500mS超时间
-    pStation->pSend->complteFlag = 0; //可以使用
-    pStation->pSend->waitFlag = 0; //等在应答
+    pStation->SendFrame.complteFlag = 0; //可以使用
+    pStation->SendFrame.waitFlag = 0; //等在应答
     switch(pStation->StationInformation.step)
     {
         case STEP_START: //启动开始
@@ -258,11 +286,7 @@ void MainDeviceNetTask(void)
 {
     for(USINT i = 0; i < STATION_COUNT; i++)
     {
-//        if(StationList[i].StationInformation.complete == TRUE)//是否完成
-//        {
-//            NormalTask(StationList + i);
-//        }
-        //是否超时，若超时则执行后续任务。
+          //是否超时，时间是否到。
           if (IsOverTime(StationList[i].StationInformation.startTime, StationList[i].StationInformation.delayTime) )
           {
               NormalTask(StationList + i);
@@ -283,7 +307,7 @@ static struct DefStationElement* GetStationPoint(USINT macID)
 {
     for (USINT i =0 ; i < STATION_COUNT; i++)
     {
-        if (StationList[i].StationInformation.macId == macID)
+        if (StationList[i].StationInformation.macID == macID)
         {
             return &StationList[i];
         }
@@ -307,11 +331,11 @@ static void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
         return;
     }
     //g_pCurrrentStation = pStation;
-    if (!pStation->pSend->waitFlag)//判断是否为等待
+    if (!pStation->SendFrame.waitFlag)//判断是否为等待
     {
         return;
     }
-    if (pStation->pDeviceNetObj->MACID != GET_GROUP2_MAC(*pID)) //判断是目的MAC与本机是否一致
+    if (GET_GROUP2_MAC(*pID) != DeviceNetObj.MACID) //判断是目的MAC与本机是否一致
     {
         return;
     }
@@ -320,7 +344,7 @@ static void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
         return;
     }
     //判断服务代码是否是对应的应答代码,或者错误响应代码
-    if (((pStation->pSend->pBuffer[1] |0x80) != pbuff[1]) || (pbuff[1] == (0x80 | SVC_ERROR_RESPONSE)))
+    if (((pStation->SendFrame.pBuffer[1] |0x80) != pbuff[1]) || (pbuff[1] == (0x80 | SVC_ERROR_RESPONSE)))
 	{
         return;
     }
@@ -330,29 +354,29 @@ static void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
     }
     for(USINT i = 0; i < len; i++)
     {
-        pStation->pRecive->pBuffer[i] = pbuff[i];
+        pStation->ReciveFrame.pBuffer[i] = pbuff[i];
     }
-    pStation->pRecive->ID = *pID;
-    pStation->pRecive->len = len;
+    pStation->ReciveFrame.ID = *pID;
+    pStation->ReciveFrame.len = len;
     
-    switch (pStation->pRecive->pBuffer[1] & 0x7F)
+    switch (pStation->ReciveFrame.pBuffer[1] & 0x7F)
     {
         case SVC_AllOCATE_MASTER_SlAVE_CONNECTION_SET://建立主从连接          
         {
             //配置连接字
-            pStation->StationInformation.state |=  pStation->pSend->pBuffer[5];             
+            pStation->StationInformation.state |=  pStation->SendFrame.pBuffer[5];             
             
             if (pStation->StationInformation.state & CYC_INQUIRE) //若建立轮询连接则进入轮询连接建立步骤
             {
                 pStation->StationInformation.step = STEP_CYCLE;
-                pStation->pSend->waitFlag = FALSE;
+                pStation->SendFrame.waitFlag = FALSE;
                 pStation->StationInformation.endTime = g_MsTicks; //设置结束时间
                 pStation->StationInformation.complete = TRUE;
             }
             else if (pStation->StationInformation.state & VISIBLE_MSG) //若建立显示连接则进入轮询连接建立步骤
             {
                 pStation->StationInformation.step = STEP_LINKING;
-                pStation->pSend->waitFlag = FALSE;
+                pStation->SendFrame.waitFlag = FALSE;
                 pStation->StationInformation.endTime = g_MsTicks;//设置结束时间
                 pStation->StationInformation.complete = TRUE;
             }
@@ -366,7 +390,7 @@ static void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
         case SVC_RELEASE_GROUP2_IDENTIFIER_SET://释放主从连接 
         {
             //配置连接字
-            pStation->StationInformation.state &=  (pStation->pSend->pBuffer[5]^ 0xFF); 
+            pStation->StationInformation.state &=  (pStation->SendFrame.pBuffer[5]^ 0xFF); 
             break;           
         }
         case SVC_GET_ATTRIBUTE_SINGLE: //获取单个属性
@@ -531,8 +555,9 @@ void SendData(struct DefFrameData* pFrame)
  */
 void StartOverTimer(void)
 {
-    g_MsTicks = 0;
-    DelayTimeMS = 1000;
+   MasterStation.StationInformation.startTime = g_MsTicks;
+   MasterStation.StationInformation.delayTime = 1000; //1000ms
+    
 }
 /**
  * 检测时间是否剩余 
@@ -542,14 +567,11 @@ void StartOverTimer(void)
  */
 BYTE IsTimeRemain(void)
 {
-    if (DelayTimeMS > g_MsTicks)
+    if (IsOverTime( MasterStation.StationInformation.startTime, MasterStation.StationInformation.delayTime))
     {
-         return TRUE;
+        return 0xFF;
     }
-    else
-    {
-        return FALSE;
-    }
+    return 0;
    
 }
 
@@ -594,17 +616,17 @@ BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
             {
                 if (mac == DeviceNetObj.MACID)
                 {                     
-                    if( MasterStation.pSend->complteFlag) //检测是否被占用
+                    if( MasterStation.SendFrame.complteFlag) //检测是否被占用
                     {
                         return FALSE;
                     }
-                    ResponseMACID(MasterStation.pSend, 0x80);       //重复MACID检查响应函数,应答，物理端口为0
+                    ResponseMACID(&MasterStation.SendFrame, 0x80);       //重复MACID检查响应函数,应答，物理端口为0
                 }
                 else
                 {
                      for(USINT i = 0; i < STATION_COUNT; i++)
                     {
-                        if(StationList[i].StationInformation.macId== mac)
+                        if(StationList[i].StationInformation.macID== mac)
                         {
                             StationList[i].StationInformation.online = TRUE;
                             StationList[i].StationInformation.state = 0;
