@@ -175,7 +175,7 @@ void reset_timer( uint8_t timer_num )
 ** Created by:          PowerAVR
 ** Created date:        2010-05-10
 ** Version:             V1.00
-** Descriptions:        ±àĞ´Ê¾Àı´úÂë
+** Descriptions:        ç¼–å†™ç¤ºä¾‹ä»£ç 
 **
 **--------------------------------------------------------------------------------------------------------       
 *********************************************************************************************************/
@@ -213,20 +213,20 @@ void SysTick_Handler(void)
 }
 
 /**
- * ÅĞ¶ÏÊ±¼äÊÇ·ñ³¬Ê±
+ * åˆ¤æ–­æ—¶é—´æ˜¯å¦è¶…æ—¶
  *
- * @param   startTime Æô¶¯Ê±¼ä
- * @param   delayTime ÑÓÊ±Ê±¼ä
+ * @param   startTime å¯åŠ¨æ—¶é—´
+ * @param   delayTime å»¶æ—¶æ—¶é—´
  * 
- * @return  0xFF-Ê±¼äµ½´ï 0-Ê±¼ä»¹Î´µ½´ï
+ * @return  0xFF-æ—¶é—´åˆ°è¾¾ 0-æ—¶é—´è¿˜æœªåˆ°è¾¾
  *
- * @bref   ±È½ÏÊ±¼äÊÇ·ñ´ïµ½Éè¶¨Öµ£¬¶ÔÒç³ö½øĞĞ³¬Ê±ÅĞ¶Ï
+ * @bref   æ¯”è¾ƒæ—¶é—´æ˜¯å¦è¾¾åˆ°è®¾å®šå€¼ï¼Œå¯¹æº¢å‡ºè¿›è¡Œè¶…æ—¶åˆ¤æ–­
  */
 inline uint8_t IsOverTime(uint32_t startTime, uint32_t delayTime)
 {
-    if (UINT32_MAX - delayTime < startTime) //ÅĞ¶ÏÊÇ·ñÒç³ö,ÈôÒç³öÔò½øĞĞÔòÏÈÅĞ¶ÏÊÇ·ñ³¬³öÒ»¸öÖÜÆÚ
+    if (UINT32_MAX - delayTime < startTime) //åˆ¤æ–­æ˜¯å¦æº¢å‡º,è‹¥æº¢å‡ºåˆ™è¿›è¡Œåˆ™å…ˆåˆ¤æ–­æ˜¯å¦è¶…å‡ºä¸€ä¸ªå‘¨æœŸ
     {
-         if( g_MsTicks < startTime)//ÏÈÅĞ¶ÏÊÇ·ñĞ¡ÓÚstartTime
+         if( g_MsTicks < startTime)//å…ˆåˆ¤æ–­æ˜¯å¦å°äºstartTime
          {
              if (g_MsTicks >= (delayTime + startTime))
              {

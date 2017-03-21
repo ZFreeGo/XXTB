@@ -1,6 +1,6 @@
 /**************************************************************************//**
  * @file     main.c
- * @brief    Ñ¡ÏàºÏÕ¢Ö÷³ÌĞò
+ * @brief    é€‰ç›¸åˆé—¸ä¸»ç¨‹åº
  * @version  V0.01
  * @date     2017/3/11
  *
@@ -21,7 +21,7 @@
 #include "timer.h"
 #include "DeviceNet.h"
 //#define PLL0CFG_Val           0x00050063  MSEL0    M= 99  N= 5  Fcco = 400M
-//#define CCLKCFG_Val           0x00000003   4       CPUÊ±ÖÓ 100M = 400/4
+//#define CCLKCFG_Val           0x00000003   4       CPUæ—¶é’Ÿ 100M = 400/4
 
 
 
@@ -36,14 +36,14 @@ void CanInit (void)
   CAN_setup (CAN2);                                  /* setup CAN Controller #2 */
  
   CAN_wrFilter(CAN2,  33, STANDARD_FORMAT);          /* Enable recep   */                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
-  LPC_CANAF->AFMR |= 0x00000002;       //½ÓÊÕÂË²¨Æ÷´¦ÓÚÅÔÂ·Ä£Ê½             
+  LPC_CANAF->AFMR |= 0x00000002;       //æ¥æ”¶æ»¤æ³¢å™¨å¤„äºæ—è·¯æ¨¡å¼             
   CAN_start (CAN2);                                  /* start CAN Controller #2 */
   CAN_waitReady (CAN2);                              /* wait til tx mbx is empty */
 }
 
 
 /**
- * mainÖ÷º¯Êı 
+ * mainä¸»å‡½æ•° 
  */
 int main (void) 
 {
@@ -62,7 +62,7 @@ int main (void)
 	Led2Set(led2);
 	led1 = 1 - led1;
 	
-    InitDeviceNet();//³õÊ¼»¯DeviceNet
+    InitDeviceNet();//åˆå§‹åŒ–DeviceNet
     MainDeviceNetTask();
     
     

@@ -1,24 +1,24 @@
 /***************************************************************
 *Copyright(c) 2016, Sojo
-*��������Ȩ��
-*�ļ�����:CAN.h
-*�ļ���ʶ:
-*�������ڣ� 2016��11��8�� 
-*ժҪ:	 ���ļ�������ʼ��ARM���� CANģ��
-*��ǰ�汾:1.0
-*����: ZFREE
-*ȡ���汾:
-*����:
-*���ʱ��:
+*保留所有权利
+*文件名称:CAN.h
+*文件标识:
+*创建日期： 2016年11月8日 
+*摘要:	 此文件用来初始化ARM自身 CAN模块
+*当前版本:1.0
+*作者: ZFREE
+*取代版本:
+*作者:
+*完成时间:
 ************************************************************/
 #ifndef __CAN_H
 #define __CAN_H
 
-#define STANDARD_FORMAT  0	 //��׼֡
-#define EXTENDED_FORMAT  1	 //��չ֡
+#define STANDARD_FORMAT  0	 //标准帧
+#define EXTENDED_FORMAT  1	 //扩展帧
 
-#define DATA_FRAME       0	  //����֡
-#define REMOTE_FRAME     1	  //Զ��֡
+#define DATA_FRAME       0	  //数据帧
+#define REMOTE_FRAME     1	  //远程帧
 
 typedef struct  {
   unsigned int   id;                    /* 29 bit identifier */

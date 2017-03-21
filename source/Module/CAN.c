@@ -1,15 +1,15 @@
 /***************************************************************
 *Copyright(c) 2016, Sojo
-*±£ÁôËùÓÐÈ¨Àû
-*ÎÄ¼þÃû³Æ:CAN.c
-*ÎÄ¼þ±êÊ¶:
-*´´½¨ÈÕÆÚ£º 2016Äê11ÔÂ8ÈÕ 
-*ÕªÒª:	 ´ËÎÄ¼þÓÃÀ´³õÊ¼»¯ARM×ÔÉí CANÄ£¿é
-*µ±Ç°°æ±¾:1.0
-*×÷Õß: ZFREE
-*È¡´ú°æ±¾:
-*×÷Õß:
-*Íê³ÉÊ±¼ä:
+*ä¿ç•™æ‰€æœ‰æƒåˆ©
+*æ–‡ä»¶åç§°:CAN.c
+*æ–‡ä»¶æ ‡è¯†:
+*åˆ›å»ºæ—¥æœŸï¼š 2016å¹´11æœˆ8æ—¥ 
+*æ‘˜è¦:	 æ­¤æ–‡ä»¶ç”¨æ¥åˆå§‹åŒ–ARMè‡ªèº« CANæ¨¡å—
+*å½“å‰ç‰ˆæœ¬:1.0
+*ä½œè€…: ZFREE
+*å–ä»£ç‰ˆæœ¬:
+*ä½œè€…:
+*å®Œæˆæ—¶é—´:
 ************************************************************/
 #include <LPC17xx.H> 
 #include "CAN.h"
@@ -48,12 +48,12 @@ const uint32_t CAN_BIT_TIME[] = {          0, /*             not used           
                                 };
 
 /******************************************************************************
- *º¯ÊýÃû£ºCAN_cfgBaudrate()
- *ÐÎ²Î£º uint32_t ctrl --CANÄ£¿é´ú±í 0-CAN1 1-CAN2, uint32_t baudrate Í¨ÐÅ²¨ÌØÂÊ£¬µ¥Î»bps
- *·µ»ØÖµ£ºvoid
- *¹¦ÄÜ£º ÅäÖÃCANÄ£¿éµÄ¹¤×÷Ê±ÖÓ£¬Éæ¼°²¨ÌØÂÊ£¬Î»¿í£¬Í¬²½ÑÓÊ±µÈ¡£
- *µ÷ÓÃº¯Êý£ºnull
- *ÒýÓÃÍâ²¿±äÁ¿£ºnull
+ *å‡½æ•°åï¼šCAN_cfgBaudrate()
+ *å½¢å‚ï¼š uint32_t ctrl --CANæ¨¡å—ä»£è¡¨ 0-CAN1 1-CAN2, uint32_t baudrate é€šä¿¡æ³¢ç‰¹çŽ‡ï¼Œå•ä½bps
+ *è¿”å›žå€¼ï¼švoid
+ *åŠŸèƒ½ï¼š é…ç½®CANæ¨¡å—çš„å·¥ä½œæ—¶é’Ÿï¼Œæ¶‰åŠæ³¢ç‰¹çŽ‡ï¼Œä½å®½ï¼ŒåŒæ­¥å»¶æ—¶ç­‰ã€‚
+ *è°ƒç”¨å‡½æ•°ï¼šnull
+ *å¼•ç”¨å¤–éƒ¨å˜é‡ï¼šnull
  *****************************************************************************/
 static void CAN_cfgBaudrate (uint32_t ctrl, uint32_t baudrate)  
 {
@@ -78,12 +78,12 @@ static void CAN_cfgBaudrate (uint32_t ctrl, uint32_t baudrate)
 
 
 /******************************************************************************
- *º¯ÊýÃû£ºCAN_setup()
- *ÐÎ²Î£º uint32_t ctrl --CANÄ£¿é´ú±í 1-CAN1 2-CAN2
- *·µ»ØÖµ£ºvoid
- *¹¦ÄÜ£º Æô¶¯CANÄ£¿éµçÔ´£¬½øÈë¸´Î»Ä£Ê½reset mode,ÅäÖÃCANÒý½Å£¬Ê¹ÄÜCAN ·¢ËÍºÍ½ÓÊÕÖÐ¶Ï£¬ÅäÖÃCAN²¨ÌØÂÊ500K
- *µ÷ÓÃº¯Êý£º NVIC_EnableIRQ(),	CAN_cfgBaudrate()
- *ÒýÓÃÍâ²¿±äÁ¿£ºnull
+ *å‡½æ•°åï¼šCAN_setup()
+ *å½¢å‚ï¼š uint32_t ctrl --CANæ¨¡å—ä»£è¡¨ 1-CAN1 2-CAN2
+ *è¿”å›žå€¼ï¼švoid
+ *åŠŸèƒ½ï¼š å¯åŠ¨CANæ¨¡å—ç”µæºï¼Œè¿›å…¥å¤ä½æ¨¡å¼reset mode,é…ç½®CANå¼•è„šï¼Œä½¿èƒ½CAN å‘é€å’ŒæŽ¥æ”¶ä¸­æ–­ï¼Œé…ç½®CANæ³¢ç‰¹çŽ‡500K
+ *è°ƒç”¨å‡½æ•°ï¼š NVIC_EnableIRQ(),	CAN_cfgBaudrate()
+ *å¼•ç”¨å¤–éƒ¨å˜é‡ï¼šnull
  *****************************************************************************/
 void CAN_setup (uint32_t ctrl)  
 {
@@ -118,12 +118,12 @@ void CAN_setup (uint32_t ctrl)
 
 
 /******************************************************************************
- *º¯ÊýÃû£ºCAN_start()
- *ÐÎ²Î£º uint32_t ctrl --CANÄ£¿é´ú±í 0-CAN1 1-CAN2
- *·µ»ØÖµ£ºvoid
- *¹¦ÄÜ£º 	 ½øÈë²Ù×÷Ä£Ê½£¬Æô¶¯CANÄ£¿é
- *µ÷ÓÃº¯Êý£º null
- *ÒýÓÃÍâ²¿±äÁ¿£ºnull
+ *å‡½æ•°åï¼šCAN_start()
+ *å½¢å‚ï¼š uint32_t ctrl --CANæ¨¡å—ä»£è¡¨ 0-CAN1 1-CAN2
+ *è¿”å›žå€¼ï¼švoid
+ *åŠŸèƒ½ï¼š 	 è¿›å…¥æ“ä½œæ¨¡å¼ï¼Œå¯åŠ¨CANæ¨¡å—
+ *è°ƒç”¨å‡½æ•°ï¼š null
+ *å¼•ç”¨å¤–éƒ¨å˜é‡ï¼šnull
  *****************************************************************************/
 void CAN_start (uint32_t ctrl)  
 {
@@ -133,12 +133,12 @@ void CAN_start (uint32_t ctrl)
 }
 
 /******************************************************************************
- *º¯ÊýÃû£ºCAN_waitReady()
- *ÐÎ²Î£º uint32_t ctrl --CANÄ£¿é´ú±í 0-CAN1 1-CAN2
- *·µ»ØÖµ£ºvoid
- *¹¦ÄÜ£ºµÈ´ý×¼±¸
- *µ÷ÓÃº¯Êý£º null
- *ÒýÓÃÍâ²¿±äÁ¿£ºCAN_TxRdy[]
+ *å‡½æ•°åï¼šCAN_waitReady()
+ *å½¢å‚ï¼š uint32_t ctrl --CANæ¨¡å—ä»£è¡¨ 0-CAN1 1-CAN2
+ *è¿”å›žå€¼ï¼švoid
+ *åŠŸèƒ½ï¼šç­‰å¾…å‡†å¤‡
+ *è°ƒç”¨å‡½æ•°ï¼š null
+ *å¼•ç”¨å¤–éƒ¨å˜é‡ï¼šCAN_TxRdy[]
  *****************************************************************************/
 void CAN_waitReady (uint32_t ctrl)  
 {
@@ -149,12 +149,12 @@ void CAN_waitReady (uint32_t ctrl)
 }
 
 /******************************************************************************
- *º¯ÊýÃû£º CAN_wrMsg()
- *ÐÎ²Î£º uint32_t ctrl --CANÄ£¿é´ú±í 0-CAN1 1-CAN2, CAN_msg *msg --´ý·¢ËÍµÄÐÅÏ¢
- *·µ»ØÖµ£ºvoid
- *¹¦ÄÜ£ºÐ´Èë½«Òª·¢ËÍµÄÅäÖÃÐÅÏ¢ÓëÊý¾Ý
- *µ÷ÓÃº¯Êý£º null
- *ÒýÓÃÍâ²¿±äÁ¿£º null
+ *å‡½æ•°åï¼š CAN_wrMsg()
+ *å½¢å‚ï¼š uint32_t ctrl --CANæ¨¡å—ä»£è¡¨ 0-CAN1 1-CAN2, CAN_msg *msg --å¾…å‘é€çš„ä¿¡æ¯
+ *è¿”å›žå€¼ï¼švoid
+ *åŠŸèƒ½ï¼šå†™å…¥å°†è¦å‘é€çš„é…ç½®ä¿¡æ¯ä¸Žæ•°æ®
+ *è°ƒç”¨å‡½æ•°ï¼š null
+ *å¼•ç”¨å¤–éƒ¨å˜é‡ï¼š null
  *****************************************************************************/
 void CAN_wrMsg (uint32_t ctrl, CAN_msg *msg)  
 {
@@ -177,12 +177,12 @@ void CAN_wrMsg (uint32_t ctrl, CAN_msg *msg)
 }
 
 /******************************************************************************
- *º¯ÊýÃû£º CAN_rdMsg()
- *ÐÎ²Î£º uint32_t ctrl --CANÄ£¿é´ú±í 0-CAN1 1-CAN2, CAN_msg *msg --´æÈ¡½ÓÊÕµÄÐÅÏ¢
- *·µ»ØÖµ£ºvoid
- *¹¦ÄÜ£º¶Á³ö½ÓÊÕµÄÅäÖÃÐÅÏ¢ÓëÊý¾Ý
- *µ÷ÓÃº¯Êý£º null
- *ÒýÓÃÍâ²¿±äÁ¿£º null
+ *å‡½æ•°åï¼š CAN_rdMsg()
+ *å½¢å‚ï¼š uint32_t ctrl --CANæ¨¡å—ä»£è¡¨ 0-CAN1 1-CAN2, CAN_msg *msg --å­˜å–æŽ¥æ”¶çš„ä¿¡æ¯
+ *è¿”å›žå€¼ï¼švoid
+ *åŠŸèƒ½ï¼šè¯»å‡ºæŽ¥æ”¶çš„é…ç½®ä¿¡æ¯ä¸Žæ•°æ®
+ *è°ƒç”¨å‡½æ•°ï¼š null
+ *å¼•ç”¨å¤–éƒ¨å˜é‡ï¼š null
  *****************************************************************************/
 void CAN_rdMsg (uint32_t ctrl, CAN_msg *msg)  
 {
@@ -206,40 +206,40 @@ void CAN_rdMsg (uint32_t ctrl, CAN_msg *msg)
 
 
 /******************************************************************************
- *º¯ÊýÃû£º CAN_wrFilter()
- *ÐÎ²Î£º uint32_t ctrl --CANÄ£¿é´ú±í 1-CAN1 2-CAN2,  uint32_t id -- ÂË²¨ID, 
-         uint8_t format -- ¸ñÊ½
- *·µ»ØÖµ£ºvoid
- *¹¦ÄÜ£º
- *µ÷ÓÃº¯Êý£º null
- *ÒýÓÃÍâ²¿±äÁ¿£º null
+ *å‡½æ•°åï¼š CAN_wrFilter()
+ *å½¢å‚ï¼š uint32_t ctrl --CANæ¨¡å—ä»£è¡¨ 1-CAN1 2-CAN2,  uint32_t id -- æ»¤æ³¢ID, 
+         uint8_t format -- æ ¼å¼
+ *è¿”å›žå€¼ï¼švoid
+ *åŠŸèƒ½ï¼š
+ *è°ƒç”¨å‡½æ•°ï¼š null
+ *å¼•ç”¨å¤–éƒ¨å˜é‡ï¼š null
  *****************************************************************************/
 void CAN_wrFilter (uint32_t ctrl, uint32_t id, uint8_t format)  
 {
-  static int CAN_std_cnt = 0;		//±ê×¼Ö¡¼ÆÊý
-  static int CAN_ext_cnt = 0;		//À©Õ¹Ö¡ÂË²¨¼ÆÊý
+  static int CAN_std_cnt = 0;		//æ ‡å‡†å¸§è®¡æ•°
+  static int CAN_ext_cnt = 0;		//æ‰©å±•å¸§æ»¤æ³¢è®¡æ•°
   uint32_t buf0, buf1;
   int cnt1, cnt2, bound1;
 
-  /* Ò»¸ö±ê×¼Ö¡ID¹ÜÀíÕ¼ÓÃ16bit£¬Ò»¸öÀ©Õ¹Ö¡¹ÜÀíÕ¼ÓÃ32bit£¬×ÜµÄ¿Õ¼äÎª512*32bit */
-  /* Ê×Ñ¡ÅÐ¶ÏAF RAM ÊÇ·ñÒÑ¾­ÂúÁË */
+  /* ä¸€ä¸ªæ ‡å‡†å¸§IDç®¡ç†å ç”¨16bitï¼Œä¸€ä¸ªæ‰©å±•å¸§ç®¡ç†å ç”¨32bitï¼Œæ€»çš„ç©ºé—´ä¸º512*32bit */
+  /* é¦–é€‰åˆ¤æ–­AF RAM æ˜¯å¦å·²ç»æ»¡äº† */
   if ((((CAN_std_cnt + 1) >> 1) + CAN_ext_cnt) >= 512) 
     return;                                       /* error: objects full */
 
-  /* ÉèÖÃAFMR = 0x01£¬ BitAccOff = 1£¬BitAccBP = 0; ÎªOff Mode ´ËÊ±¿ÉÒÔÅäÖÃAF RAM  */                                
+  /* è®¾ç½®AFMR = 0x01ï¼Œ BitAccOff = 1ï¼ŒBitAccBP = 0; ä¸ºOff Mode æ­¤æ—¶å¯ä»¥é…ç½®AF RAM  */                                
   LPC_CANAF->AFMR = 0x00000001;
   /* Add mask for standard identifiers */
   if (format == STANDARD_FORMAT)  	  
   {              
-    id |= (ctrl-1) << 13;                        /* Add controller number bit15-13´ú±í¿ØÖÆÆ÷ºÅ 000-CAN1 001-CAN2 */
-    id &= 0x0000F7FF;                            /* Mask out 16-bits of ID bit11 Ã»ÓÐÊ¹ÓÃ*/
+    id |= (ctrl-1) << 13;                        /* Add controller number bit15-13ä»£è¡¨æŽ§åˆ¶å™¨å· 000-CAN1 001-CAN2 */
+    id &= 0x0000F7FF;                            /* Mask out 16-bits of ID bit11 æ²¡æœ‰ä½¿ç”¨*/
     
-    if ((CAN_std_cnt & 0x0001) == 0 && CAN_ext_cnt != 0)   /*±ê×¼Ö¡IDÎªÅ¼Êý¸öÇÒÀ©Õ¹Ö¡ID¸öÊý²»ÎªÁã*/
+    if ((CAN_std_cnt & 0x0001) == 0 && CAN_ext_cnt != 0)   /*æ ‡å‡†å¸§IDä¸ºå¶æ•°ä¸ªä¸”æ‰©å±•å¸§IDä¸ªæ•°ä¸ä¸ºé›¶*/
 	{
-      cnt1   = (CAN_std_cnt >> 1);		  /*16bit×ª32bit¶ÔÆë*/
-      bound1 = CAN_ext_cnt;		          /*À©Õ¹Ö¡±ß½ç¼ÆÊý*/
+      cnt1   = (CAN_std_cnt >> 1);		  /*16bitè½¬32bitå¯¹é½*/
+      bound1 = CAN_ext_cnt;		          /*æ‰©å±•å¸§è¾¹ç•Œè®¡æ•°*/
       buf0   = LPC_CANAF_RAM->mask[cnt1];
-      while (bound1--)  			      /*½«À©Õ¹Ö¡IDÕûÌåÏòÏÂÒÆ¶¯£¬Îª±ê×¼Ö¡ÌÚ³ö¿Õ¼ä*/
+      while (bound1--)  			      /*å°†æ‰©å±•å¸§IDæ•´ä½“å‘ä¸‹ç§»åŠ¨ï¼Œä¸ºæ ‡å‡†å¸§è…¾å‡ºç©ºé—´*/
 	  {
         cnt1++;
         buf1 = LPC_CANAF_RAM->mask[cnt1];
@@ -248,21 +248,21 @@ void CAN_wrFilter (uint32_t ctrl, uint32_t id, uint8_t format)
       }        
     }
 
-    if (CAN_std_cnt == 0)  		 /* ±ê×¼Ö¡IDÊýÄ¿Îª0£¬ÔòÇ¶ÈëµÚÒ»¸ö*/
+    if (CAN_std_cnt == 0)  		 /* æ ‡å‡†å¸§IDæ•°ç›®ä¸º0ï¼Œåˆ™åµŒå…¥ç¬¬ä¸€ä¸ª*/
 	{                     
       LPC_CANAF_RAM->mask[0] = 0x0000FFFF | (id << 16);
     }  
-	else if (CAN_std_cnt == 1)  /* ±ê×¼Ö¡IDÊýÄ¿Îª1£¬ÔòÇ¶ÈëµÚ¶þ¸ö */
+	else if (CAN_std_cnt == 1)  /* æ ‡å‡†å¸§IDæ•°ç›®ä¸º1ï¼Œåˆ™åµŒå…¥ç¬¬äºŒä¸ª */
 	{             
-      if ((LPC_CANAF_RAM->mask[0] >> 16) > id) /* ½«´óºÅID·ÅÖÃÓÚµÍ16bit */
+      if ((LPC_CANAF_RAM->mask[0] >> 16) > id) /* å°†å¤§å·IDæ”¾ç½®äºŽä½Ž16bit */
         LPC_CANAF_RAM->mask[0] = (LPC_CANAF_RAM->mask[0] >> 16) | (id << 16);
       else
         LPC_CANAF_RAM->mask[0] = (LPC_CANAF_RAM->mask[0] & 0xFFFF0000) | id;
     }  
 	else  
 	{
-      /*¸ù¾ÝID´óÐ¡Ñ°ÕÒ²åÈëÎ»ÖÃ */
-	  /*·Ö³ÉÆæÊýoddÓëÅ¼ÊýevenÁ½ÖÖ²åÈë*/
+      /*æ ¹æ®IDå¤§å°å¯»æ‰¾æ’å…¥ä½ç½® */
+	  /*åˆ†æˆå¥‡æ•°oddä¸Žå¶æ•°evenä¸¤ç§æ’å…¥*/
       cnt1 = 0;
       cnt2 = CAN_std_cnt;
       bound1 = (CAN_std_cnt - 1) >> 1;
@@ -280,7 +280,7 @@ void CAN_wrFilter (uint32_t ctrl, uint32_t id, uint8_t format)
         }
         cnt1++;                                  /* cnt1 = U32 where to insert new ID */
       }                                          /* cnt2 = U16 where to insert new ID */
-	   /*¶ÔÓÚ´óÓÚ×îºóÒ»¸öIDµÄÖ±½Ó²åÈë*/
+	   /*å¯¹äºŽå¤§äºŽæœ€åŽä¸€ä¸ªIDçš„ç›´æŽ¥æ’å…¥*/
       if (cnt1 > bound1)  
 	  {                      /* Adding ID as last entry */
         if ((CAN_std_cnt & 0x0001) == 0)         /* Even number of IDs exists */
@@ -290,16 +290,16 @@ void CAN_wrFilter (uint32_t ctrl, uint32_t id, uint8_t format)
       }  
 	  else  
 	  {
-        buf0 = LPC_CANAF_RAM->mask[cnt1];        /* ¼ÇÂ¼µ±Ç°ID */
-        if ((cnt2 & 0x0001) == 0)                /* ²åÈëÐÂµÄÑÚÂëIDµ½ÆæÊýevenÎ»ÖÃ */
+        buf0 = LPC_CANAF_RAM->mask[cnt1];        /* è®°å½•å½“å‰ID */
+        if ((cnt2 & 0x0001) == 0)                /* æ’å…¥æ–°çš„æŽ©ç IDåˆ°å¥‡æ•°evenä½ç½® */
           buf1 = (id << 16) | (buf0 >> 16);
-        else                                     /* ²åÈëÐÂµÄÑÚÂëIDµ½ÆæÊýoddÎ»ÖÃ */
+        else                                     /* æ’å…¥æ–°çš„æŽ©ç IDåˆ°å¥‡æ•°oddä½ç½® */
           buf1 = (buf0 & 0xFFFF0000) | id;
      
-        LPC_CANAF_RAM->mask[cnt1] = buf1;        /* µ±Ç°Î»ÖÃ²åÈëÑÚÂëID */
+        LPC_CANAF_RAM->mask[cnt1] = buf1;        /* å½“å‰ä½ç½®æ’å…¥æŽ©ç ID */
 
         bound1 = CAN_std_cnt >> 1;
-        /* ½«Ê£ÓàËùÓÐIDÏòÏÂÒÆ¶¯Ò»¸öÎ»ÖÃ */
+        /* å°†å‰©ä½™æ‰€æœ‰IDå‘ä¸‹ç§»åŠ¨ä¸€ä¸ªä½ç½® */
         while (cnt1 < bound1)  
 		{
           cnt1++;
@@ -308,7 +308,7 @@ void CAN_wrFilter (uint32_t ctrl, uint32_t id, uint8_t format)
           buf0  = buf1;
         }
 
-        if ((CAN_std_cnt & 0x0001) == 0)         /* Èç¹ûÊÇÆæÊý¸ö£¬½«µÍ16Î»Ìî³äÎªÈ«1¹Ø±ÕAF_RAM */
+        if ((CAN_std_cnt & 0x0001) == 0)         /* å¦‚æžœæ˜¯å¥‡æ•°ä¸ªï¼Œå°†ä½Ž16ä½å¡«å……ä¸ºå…¨1å…³é—­AF_RAM */
           LPC_CANAF_RAM->mask[cnt1] = (LPC_CANAF_RAM->mask[cnt1] & 0xFFFF0000) | (0x0000FFFF);
       }
     }
@@ -361,12 +361,12 @@ void CAN_wrFilter (uint32_t ctrl, uint32_t id, uint8_t format)
 
 
 /******************************************************************************
- *º¯ÊýÃû£º CAN_IRQHandler()
- *ÐÎ²Î£º void
- *·µ»ØÖµ£ºvoid
- *¹¦ÄÜ£ºCAN½ÓÊÕÖÐ¶Ï
- *µ÷ÓÃº¯Êý£º null
- *ÒýÓÃÍâ²¿±äÁ¿£º null
+ *å‡½æ•°åï¼š CAN_IRQHandler()
+ *å½¢å‚ï¼š void
+ *è¿”å›žå€¼ï¼švoid
+ *åŠŸèƒ½ï¼šCANæŽ¥æ”¶ä¸­æ–­
+ *è°ƒç”¨å‡½æ•°ï¼š null
+ *å¼•ç”¨å¤–éƒ¨å˜é‡ï¼š null
  *****************************************************************************/
 void CAN_IRQHandler (void)  
 {

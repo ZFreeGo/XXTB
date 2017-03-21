@@ -1,28 +1,28 @@
 /***************************************************************
 *Copyright(c) 2016, Sojo
-*±£ÁôËùÓÐÈ¨Àû
-*ÎÄ¼þÃû³Æ:DeviceIO.h
-*ÎÄ¼þ±êÊ¶:
-*´´½¨ÈÕÆÚ£º 2016Äê11ÔÂ8ÈÕ 
-*ÕªÒª:	 ´ËÎÄ¼þÓÃÀ´¶¨Òå»ù±¾Ä£¿é³õÊ¼»¯µÄÍ·ÎÄ¼þ£¬ÏÖÔÚÉæ¼°µÄÓÐLED¿ØÖÆ
-*µ±Ç°°æ±¾:1.0
-*×÷Õß: ZFREE
-*È¡´ú°æ±¾:
-*×÷Õß:
-*Íê³ÉÊ±¼ä:
+*ä¿ç•™æ‰€æœ‰æƒåˆ©
+*æ–‡ä»¶åç§°:DeviceIO.h
+*æ–‡ä»¶æ ‡è¯†:
+*åˆ›å»ºæ—¥æœŸï¼š 2016å¹´11æœˆ8æ—¥ 
+*æ‘˜è¦:	 æ­¤æ–‡ä»¶ç”¨æ¥å®šä¹‰åŸºæœ¬æ¨¡å—åˆå§‹åŒ–çš„å¤´æ–‡ä»¶ï¼ŒçŽ°åœ¨æ¶‰åŠçš„æœ‰LEDæŽ§åˆ¶
+*å½“å‰ç‰ˆæœ¬:1.0
+*ä½œè€…: ZFREE
+*å–ä»£ç‰ˆæœ¬:
+*ä½œè€…:
+*å®Œæˆæ—¶é—´:
 ************************************************************/
 #ifndef _DEVICEIO_H
 #define _DEVICEIO_H
 #include <stdint.h>
-#define SET_BIT(x, n) {(x) |= 1<<(n);}     //ÖÃxµÄn bitÎª 1
-#define CLR_BIT(x, n) {(x) &= ~(1<<(n));}  //ÖÃxµÄn bitÎª 0
+#define SET_BIT(x, n) {(x) |= 1<<(n);}     //ç½®xçš„n bitä¸º 1
+#define CLR_BIT(x, n) {(x) &= ~(1<<(n));}  //ç½®xçš„n bitä¸º 0
 
 
 #define LED1_BIT 29  //P0_29
 #define LED2_BIT 25  //P3_25
 
 
-/**********DATAn--ÍâÉè¶ÔÓ¦¹ØÏµ
+/**********DATAn--å¤–è®¾å¯¹åº”å…³ç³»
 595_SHCP    -- DATA1 -- O
 595_DS      -- DATA2 -- O
 595_MR      -- DATA3 -- O
@@ -36,13 +36,13 @@
 
 *****************************/
 
-//595Çý¶¯Òý½Å
+//595é©±åŠ¨å¼•è„š
 #define SHCP595_BIT   26//DATA1  P1[26]
 #define DS595_BIT     25//DATA2  P1[25]
 #define MR595_BIT     24//DATA3  P1[24]  
 #define STCP595_BIT   23//DATA4  P1[23]
 
-//165Çý¶¯Òý½Å
+//165é©±åŠ¨å¼•è„š
 #define SL165_BIT     22//DATA5  P1[22]
 #define CLKINH165_BIT 21//DATA6  P1[21] 
 #define CLK165_BIT    20//DATA7  P1[20] 
