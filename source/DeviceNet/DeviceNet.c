@@ -122,16 +122,14 @@ static void InitSlaveStationData(void)
     StationList[5].ReciveFrame.pBuffer = ReceiveDataBuffer5;
     StationList[5].SendFrame.len = 8;
     StationList[5].SendFrame.pBuffer = SendDataBuffer5;
-
-    
-
+   
     
     for(USINT i =0; i < STATION_COUNT; i++)
     {
         StationList[i].StationInformation.step = STEP_START;
         StationList[i].StationInformation.complete =TRUE;
-        StationList[i].StationInformation.startTime = 0;
-        StationList[i].StationInformation.delayTime = 0;
+        StationList[i].StationInformation.startTime = g_MsTicks +  1000*i;
+        StationList[i].StationInformation.delayTime = 1000;
         StationList[i].StationInformation.endTime = 0;
         StationList[i].StationInformation.OverTimeCount = 0;
         
@@ -146,17 +144,14 @@ static void InitSlaveStationData(void)
      StationList[5].StationInformation.macID = 0x1C; //监控C
 
 }
-
-
 /**
- * 初始化DeviceNet所涉及的基本数据
+ * 初始化主站所涉及的基本数据
  */
-void InitDeviceNet(void)
-{    
-
-  
+static void InitMasterStationData(void)
+{
+    
     //////////初始化DeviceNetObj对象////////////////////////////////
-	DeviceNetObj.MACID =0x20 ;                   //如果跳键没有设置从站地址，默认主站地址0x02            
+	DeviceNetObj.MACID =0x0A;                   //如果跳键没有设置从站地址，默认主站地址0x02            
 	DeviceNetObj.baudrate = 2;                   //500Kbit/s
 	DeviceNetObj.assign_info.select = 0;         //初始的配置选择字节清零
 	DeviceNetObj.assign_info.master_MACID =0x0A; //默认主站地址，在预定义主从连接建立过程中，主站还会告诉从站：主站的地址
@@ -189,20 +184,22 @@ void InitDeviceNet(void)
     
     MasterStation.StationInformation.online = 0;
     MasterStation.StationInformation.state = 0;   
-    StationList[0].StationInformation.macID = 0x02; //主站地址
-    
+}
 
-    
-    InitSlaveStationData();
-    
-    g_pCurrrentStation = StationList; //当前指针变量指向从站第一站点
-    
+/**
+ * 初始化DeviceNet所涉及的基本数据
+ */
+void InitDeviceNet(void)
+{    
+    InitMasterStationData();
+  
     
     BOOL result =  CheckMACID(&MasterStation.ReciveFrame, &MasterStation.SendFrame);
     
     while(result);
     
-    
+    InitSlaveStationData();
+     g_pCurrrentStation = StationList; //当前指针变量指向从站第一站点
 }
 
 
@@ -251,7 +248,7 @@ static void NormalTask(struct DefStationElement* pStation)
     
     pStation->StationInformation.complete = FALSE;
     pStation->StationInformation.startTime = g_MsTicks; 
-    pStation->StationInformation.delayTime = 500;//500mS超时间
+    pStation->StationInformation.delayTime = 1000;//500mS超时间
     pStation->SendFrame.complteFlag = 0; //可以使用
     pStation->SendFrame.waitFlag = 0; //等在应答
     switch(pStation->StationInformation.step)
@@ -284,14 +281,16 @@ static void NormalTask(struct DefStationElement* pStation)
  */
 void MainDeviceNetTask(void)
 {
-    for(USINT i = 0; i < STATION_COUNT; i++)
+    while(TRUE)
     {
-          //是否超时，时间是否到。
-          if (IsOverTime(StationList[i].StationInformation.startTime, StationList[i].StationInformation.delayTime) )
-          {
-              NormalTask(StationList + i);
-          }
-        
+        for(USINT i = 0; i < STATION_COUNT; i++)
+        {
+              //是否超时，时间是否到。
+              if (IsOverTime(StationList[i].StationInformation.startTime, StationList[i].StationInformation.delayTime) )
+              {
+                  NormalTask(StationList + i);
+              }        
+        }
     }
 }
 
@@ -335,7 +334,7 @@ static void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
     {
         return;
     }
-    if (GET_GROUP2_MAC(*pID) != DeviceNetObj.MACID) //判断是目的MAC与本机是否一致
+    if (GET_GROUP2_MAC(*pID) != pStation->StationInformation.macID) //判断是目的MAC与本机是否一致
     {
         return;
     }
@@ -499,6 +498,7 @@ BOOL CheckMACID(struct DefFrameData* pReciveFrame, struct DefFrameData* pSendFra
     do
     {
         pReciveFrame->complteFlag = 0;
+        
            //发送请求
         ResponseMACID( pSendFrame, 0);
         StartOverTimer();//启动超时定时器
@@ -569,9 +569,9 @@ BYTE IsTimeRemain(void)
 {
     if (IsOverTime( MasterStation.StationInformation.startTime, MasterStation.StationInformation.delayTime))
     {
-        return 0xFF;
+        return FALSE;
     }
-    return 0;
+    return TRUE;
    
 }
 

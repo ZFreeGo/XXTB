@@ -236,7 +236,7 @@ inline uint8_t IsOverTime(uint32_t startTime, uint32_t delayTime)
     }
     else
     {
-        if (g_MsTicks >= startTime)
+        if (g_MsTicks >= startTime + delayTime)
         {
             return 0xFF;
         }                

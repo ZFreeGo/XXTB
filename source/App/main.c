@@ -20,10 +20,9 @@
 #include "CAN.h"
 #include "timer.h"
 #include "DeviceNet.h"
-
-
 //#define PLL0CFG_Val           0x00050063  MSEL0    M= 99  N= 5  Fcco = 400M
-//#define CCLKCFG_Val           0x00000003   4        CPU时钟 100M = 400/4
+//#define CCLKCFG_Val           0x00000003   4       CPU时钟 100M = 400/4
+
 
 
  /*----------------------------------------------------------------------------
@@ -50,43 +49,24 @@ int main (void)
 {
   uint16_t led1 = 0;
   uint16_t led2 = 1; 
-  uint16_t i = 0;
+
   SystemInit();
   if (SysTick_Config(SystemCoreClock / 1000)) { /* Setup SysTick Timer for 100 msec interrupts  */
     while (1);                                  /* Capture error */
   }
-  //init_timer( 0, TIME_INTERVAL ); // 10ms	
-  //enable_timer( 0 );
 
-  LedInit();                         
-  CanInit();
- 
-  	//Led1On();
-	//Led2Off();
+    LedInit();                         
+    CanInit();
+
 	Led1Set(led1);
 	Led2Set(led2);
 	led1 = 1 - led1;
 	
-	//Led2On();
-	//Led1Off();
-//	Led1Set(0);
-//	Led2Set(1);
-	
-   // delayMs(1, 500);
-
-	CAN_TxMsg[1].data[0] = i++;
-    CAN_TxMsg[1].data[0] = i++;
-    CAN_TxMsg[1].id = 0x023;    
-	CAN_TxMsg[1].len = 2;
-	CAN_TxMsg[1].format = STANDARD_FORMAT;
-	CAN_TxMsg[1].type = DATA_FRAME;
-	CAN_waitReady (CAN2);   
+    InitDeviceNet();//初始化DeviceNet
+    MainDeviceNetTask();
     
-    while(TRUE)
-    {
-        InitDeviceNet();//初始化DeviceNet
-        
-    }
+    
+    while(1);
 
     
   
