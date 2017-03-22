@@ -136,13 +136,19 @@ static void InitSlaveStationData(void)
         StationList[i].StationInformation.online = 0;
         StationList[i].StationInformation.state = 0;       
     }
-     StationList[0].StationInformation.macID = 0x10; //永磁控制器A
-     StationList[1].StationInformation.macID = 0x12; //永磁控制器B
-     StationList[2].StationInformation.macID = 0x14; //永磁控制器C
-     StationList[3].StationInformation.macID = 0x18; //监控A
-     StationList[4].StationInformation.macID = 0x1A; //监控B
-     StationList[5].StationInformation.macID = 0x1C; //监控C
+    StationList[0].StationInformation.macID = 0x10; //永磁控制器A
+    StationList[1].StationInformation.macID = 0x12; //永磁控制器B
+    StationList[2].StationInformation.macID = 0x14; //永磁控制器C
+    StationList[3].StationInformation.macID = 0x18; //监控A
+    StationList[4].StationInformation.macID = 0x1A; //监控B
+    StationList[5].StationInformation.macID = 0x1C; //监控C
 
+    StationList[0].StationInformation.enable = TRUE;
+    StationList[1].StationInformation.enable = FALSE;
+    StationList[2].StationInformation.enable = FALSE;
+    StationList[3].StationInformation.enable = FALSE;
+    StationList[4].StationInformation.enable = FALSE;
+    StationList[5].StationInformation.enable = FALSE;     
 }
 /**
  * 初始化主站所涉及的基本数据
@@ -247,26 +253,44 @@ static void NormalTask(struct DefStationElement* pStation)
     }
     
     pStation->StationInformation.complete = FALSE;
-    pStation->StationInformation.startTime = g_MsTicks; 
-    pStation->StationInformation.delayTime = 1000;//500mS超时间
+    
     pStation->SendFrame.complteFlag = 0; //可以使用
     pStation->SendFrame.waitFlag = 0; //等在应答
     switch(pStation->StationInformation.step)
     {
         case STEP_START: //启动开始
         {
+            pStation->StationInformation.startTime = g_MsTicks; 
+            if( pStation->StationInformation.OverTimeCount > 3)
+            {
+                pStation->StationInformation.delayTime = 3000;//1000mS超时间
+            }
+            else
+            {
+                pStation->StationInformation.delayTime = 1000;//1000mS超时间
+            }
             
-            EstablishConnection(pStation, VISIBLE_MSG);
-          
+            EstablishConnection(pStation, VISIBLE_MSG);          
             break;
         }
         case STEP_LINKING: //正在建立连接
         {
+            pStation->StationInformation.startTime = g_MsTicks; 
+            if( pStation->StationInformation.OverTimeCount > 3)
+            {
+                pStation->StationInformation.delayTime = 3000;//1000mS超时间
+            }
+            else
+            {
+                pStation->StationInformation.delayTime = 1000;//1000mS超时间
+            }
             EstablishConnection(pStation, CYC_INQUIRE);
             break;
         }
         case STEP_CYCLE: //循环建立连接
         {
+            pStation->StationInformation.startTime = g_MsTicks; 
+            pStation->StationInformation.delayTime = 1000;//1000mS超时间
             break;
         }
     }   
@@ -281,17 +305,16 @@ static void NormalTask(struct DefStationElement* pStation)
  */
 void MainDeviceNetTask(void)
 {
-    while(TRUE)
-    {
-        for(USINT i = 0; i < STATION_COUNT; i++)
+    
+        for(USINT i = 0; i < STATION_COUNT; i++)//STATION_COUNT
         {
               //是否超时，时间是否到。
-              if (IsOverTime(StationList[i].StationInformation.startTime, StationList[i].StationInformation.delayTime) )
+              if (StationList[i].StationInformation.enable  && IsOverTime(StationList[i].StationInformation.startTime, StationList[i].StationInformation.delayTime) )
               {
                   NormalTask(StationList + i);
               }        
         }
-    }
+    
 }
 
 
@@ -363,7 +386,7 @@ static void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
         case SVC_AllOCATE_MASTER_SlAVE_CONNECTION_SET://建立主从连接          
         {
             //配置连接字
-            pStation->StationInformation.state |=  pStation->SendFrame.pBuffer[5];             
+            pStation->StationInformation.state |=  pStation->SendFrame.pBuffer[4];             
             
             if (pStation->StationInformation.state & CYC_INQUIRE) //若建立轮询连接则进入轮询连接建立步骤
             {

@@ -508,16 +508,6 @@
               <FilePath>.\source\Module\rtc.h</FilePath>
             </File>
             <File>
-              <FileName>UART.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\Module\UART.c</FilePath>
-            </File>
-            <File>
-              <FileName>UART.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\Module\UART.h</FilePath>
-            </File>
-            <File>
               <FileName>timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\source\Module\timer.c</FilePath>
@@ -526,6 +516,51 @@
               <FileName>timer.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\source\Module\timer.h</FilePath>
+            </File>
+            <File>
+              <FileName>RS485.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\Module\RS485.c</FilePath>
+            </File>
+            <File>
+              <FileName>RS485.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\source\Module\RS485.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>SerialPort</GroupName>
+          <Files>
+            <File>
+              <FileName>Action.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\source\DeviceNet\Action.h</FilePath>
+            </File>
+            <File>
+              <FileName>CRC16.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\DeviceNet\CRC16.c</FilePath>
+            </File>
+            <File>
+              <FileName>CRC16.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\source\DeviceNet\CRC16.h</FilePath>
+            </File>
+            <File>
+              <FileName>RtuFrame.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\DeviceNet\RtuFrame.c</FilePath>
+            </File>
+            <File>
+              <FileName>RtuFrame.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\source\DeviceNet\RtuFrame.h</FilePath>
+            </File>
+            <File>
+              <FileName>Action.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Action.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -20,9 +20,13 @@
 #include "CAN.h"
 #include "timer.h"
 #include "DeviceNet.h"
+#include "RS485.h"
+#include "RtuFrame.h"
+#include "Action.h"
+
 //#define PLL0CFG_Val           0x00050063  MSEL0    M= 99  N= 5  Fcco = 400M
 //#define CCLKCFG_Val           0x00000003   4       CPU时钟 100M = 400/4
-
+#define UART2_BPS   57600    //UART2的波特率
 
 
  /*----------------------------------------------------------------------------
@@ -40,33 +44,47 @@ void CanInit (void)
   CAN_start (CAN2);                                  /* start CAN Controller #2 */
   CAN_waitReady (CAN2);                              /* wait til tx mbx is empty */
 }
-
+frameRtu sendFrame, recvFrame;
 
 /**
  * main主函数 
  */
 int main (void) 
 {
-  uint16_t led1 = 0;
-  uint16_t led2 = 1; 
+    uint16_t led1 = 0;
+    uint16_t led2 = 1; 
+    uint16_t result = 0;
+    SystemInit();
+    if (SysTick_Config(SystemCoreClock / 1000)) 
+    {                                               /* Setup SysTick Timer for 100 msec interrupts  */
+        while (1);                                  /* Capture error */
+    }
 
-  SystemInit();
-  if (SysTick_Config(SystemCoreClock / 1000)) { /* Setup SysTick Timer for 100 msec interrupts  */
-    while (1);                                  /* Capture error */
-  }
-
-    LedInit();                         
+    InitDeviceIO();
+    Init_UART2(UART2_BPS);                          
     CanInit();
-
+    ReciveFrameDataInit(); //接收帧初始化
+    sendFrame.address =  LOCAL_ADDRESS; //本机接收地址处理
+  
 	Led1Set(led1);
 	Led2Set(led2);
 	led1 = 1 - led1;
 	
     InitDeviceNet();//初始化DeviceNet
-    MainDeviceNetTask();
+    
+  
+    while(1)
+    {
+        MainDeviceNetTask();
+        result = ReciveBufferDataDealing(&sendFrame, &recvFrame);//返回剩余长度
+        if (recvFrame.completeFlag == TRUE)
+        {
+            ExecuteFunctioncode(&recvFrame);
+        }
+    }
     
     
-    while(1);
+   // while(1);
 
     
   

@@ -10,3 +10,6 @@
 .\out\main.o: .\source\Module\CAN.h
 .\out\main.o: .\source\Module\timer.h
 .\out\main.o: .\source\DeviceNet\DeviceNet.h
+.\out\main.o: .\source\Module\RS485.h
+.\out\main.o: .\source\DeviceNet\RtuFrame.h
+.\out\main.o: .\source\DeviceNet\Action.h

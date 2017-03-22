@@ -115,3 +115,11 @@ void LedInit(void)
 
 }
 
+void InitDeviceIO(void)
+{
+    LedInit();
+    
+   RS485_RD_DIR = OUT;
+   RX_MODE();  //默认将485置为接收状态
+}
+

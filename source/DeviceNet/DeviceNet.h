@@ -231,6 +231,8 @@ struct DefStationInformation
     
     USINT OverTimeCount;//超时次数
     
+    BOOL enable; //使能
+    
 };
 /**
  *站点要素定义体
