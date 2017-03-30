@@ -9,3 +9,4 @@
 .\out\devicenet.o: source\DeviceNet\DeviceNet.h
 .\out\devicenet.o: .\source\Module\can.h
 .\out\devicenet.o: .\source\Module\timer.h
+.\out\devicenet.o: source\DeviceNet\RTuframe.h

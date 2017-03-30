@@ -15,6 +15,8 @@
 #include "DeviceNet.h"
 #include "can.h"
 #include "timer.h"
+#include "RTuframe.h"
+
 
 #define STEP_START        0xA1 //启动状态,上电初始状态
 #define STEP_LINKING      0xA2 //正在建立连接中
@@ -32,6 +34,7 @@ static BOOL MakeUnconnectVisibleRequestMessageOnlyGroup2(struct DefFrameData* pF
     BYTE destMAC,BYTE serverCode, BYTE config);
 static void EstablishConnection(struct DefStationElement* pStation, USINT connectType);
 static BOOL MakeIOMessage(struct DefFrameData* pFrame, BYTE destMAC, BYTE* pData, BYTE datalen);
+static void SlaveStationStatusCycleService(WORD* pID, BYTE* pbuff, BYTE len);
 ////////////////////////////////////////////////////////////可考虑存入EEPROM
 UINT  providerID = 0X1234;               // 供应商ID 
 UINT  device_type = 0;                   // 通用设备
@@ -222,11 +225,13 @@ void InitDeviceNet(void)
  */
 void DeviceNetSendIOData( struct DefStationElement* pStation, USINT* pData, USINT datalen)
 {
+    pStation->SendFrame.len = 8;   
     BYTE result = MakeIOMessage( &pStation->SendFrame, pStation->StationInformation.macID, pData,  datalen);
     if (result)
     {
         SendData( &pStation->SendFrame);
         pStation->SendFrame.waitFlag = TRUE;
+        
     }       
 }
 
@@ -241,6 +246,7 @@ void DeviceNetSendIOData( struct DefStationElement* pStation, USINT* pData, USIN
 static void EstablishConnection(struct DefStationElement* pStation, USINT connectType)
 {
     //建立显示连接
+    pStation->SendFrame.len = 8;  
     BOOL result =  MakeUnconnectVisibleRequestMessageOnlyGroup2( &pStation->SendFrame,  pStation->StationInformation.macID,
     SVC_AllOCATE_MASTER_SlAVE_CONNECTION_SET, connectType);
     if (result)
@@ -459,6 +465,21 @@ static void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
     
 }
 /**
+ * 从站从站IO轮询或状态变化/循环应答消息
+ *
+ * @param   pID     ID号指针
+ * @param   pbuff   指向缓冲区数据指针
+ * @param   len     缓冲区数据长度
+ */
+static void SlaveStationStatusCycleService(WORD* pID, BYTE* pbuff, BYTE len)
+{
+     USINT sendData[16] = {0};
+     USINT datalen = 0;
+     GenRTUFrame(0x1A, 1, pbuff, len,sendData, &datalen);
+     SendFrame(sendData, datalen);  
+}
+
+/**
  * 生成仅限组2非连接显示请求信息
  *
  * @param   pFrame     指向报文数据的指针,长度指针表示所指向缓冲区的最小长度
@@ -668,7 +689,21 @@ BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
    
     if (((*pID) & 0x07C0) <= 0x3C0) //Group1
     {
-        BYTE  mac = GET_GROUP2_MAC(*pID);
+        BYTE  mac = GET_GROUP1_MAC(*pID);
+        BYTE  function = GET_GROUP1_FUNCTION(*pID);
+        switch(function)
+        {
+            case GROUP1_POLL_STATUS_CYCLER_ACK:
+            {
+                SlaveStationStatusCycleService(pID, pbuff, len);
+                break;
+            }            
+            default:
+            {
+                break;
+            }
+        }
+        
         
         
     }
@@ -681,11 +716,8 @@ BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
             case GROUP2_VISIBLE_UCN: //从站显示响应服务
             {
                 if (len >= 2)
-                {
-                    
-                   
-                        SlaveStationVisibleMsgService(pID, pbuff, len);
-                                                      
+                {                   
+                    SlaveStationVisibleMsgService(pID, pbuff, len);                                 
                 }
                 break;
             }

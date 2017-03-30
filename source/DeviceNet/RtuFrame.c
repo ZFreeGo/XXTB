@@ -301,10 +301,9 @@ void SendFrame(uint8_t* pFrame, uint8_t len)
 {
     uint8_t i = 0;
     TX_MODE();
-    DelayMs(1);
-    
-     UART2_SendData(pFrame, len);
-     RX_MODE();  //默认接收
+   // DelayMs(1); 异常    
+    UART2_SendData(pFrame, len);
+    RX_MODE();  //默认接收
 }
 
 /***********************************************************
