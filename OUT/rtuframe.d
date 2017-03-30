@@ -10,3 +10,4 @@
 .\out\rtuframe.o: D:\Program Files (x86)\Keil_5.0\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmFunc.h
 .\out\rtuframe.o: D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx\system_LPC17xx.h
 .\out\rtuframe.o: .\source\Module\Rs485.h
+.\out\rtuframe.o: .\source\Module\Timer.h

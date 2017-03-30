@@ -31,6 +31,8 @@ extern void TIMER1_IRQHandler (void);
 
 extern void SysTick_Handler(void);
 extern uint8_t IsOverTime(uint32_t startTime, uint32_t delayTime);
+extern void DelayMs (uint32_t dlyTicks) ;
+
 extern volatile uint32_t g_MsTicks;   
 #endif /* end __TIMER_H */
 /*****************************************************************************

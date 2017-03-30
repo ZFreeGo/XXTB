@@ -4,6 +4,7 @@
 #include <string.h>
 #include "LPC17xx.h"
 #include "Rs485.h"
+#include "Timer.h"
 
 /******************************************
 //针对此种情况出队与入队可能发生冲突。
@@ -222,7 +223,7 @@ uint8_t ReciveBufferDataDealing(frameRtu* pJudgeFrame, frameRtu* pReciveFrame)
 //                    }
                     }
                     //ClrWdt();
-                   // StopTimer2();  //超时检测结束  100ns以内处理一帧数据若超时则丢弃                
+                   // StopTimer2();  //超时检测结束  100ms以内处理一帧数据若超时则丢弃                
                     DealStep = 0;
                 }
                 break;
@@ -281,27 +282,29 @@ void  GenRTUFrame(uint8_t addr, uint8_t funcode,
             //ClrWdt();
             uint16_t crc =  CRC16(pRtuFrame, len - 2);
             //uint16_t crc = len;//用总长度代替
-            pRtuFrame[len - 2] = (uint8_t)(crc & 0xFF); //浣��
-            pRtuFrame[len - 1] = (uint8_t)(crc & 0xFF00 >> 8);//楂��
+            pRtuFrame[len - 2] = (uint8_t)(crc & 0x00FF); //浣��
+            pRtuFrame[len - 1] = (uint8_t)(crc  >> 8);//楂��
             //ClrWdt();
             completeFlag = 0;
         }
 
 
+        
+/**
+ * 发送帧数据
+ *
+ * @param  pFrame  指向发送报文的指针
+ * @param  len     发送报文数据长度
+ * @return null
+ */
 void SendFrame(uint8_t* pFrame, uint8_t len)
 {
     uint8_t i = 0;
     TX_MODE();
-    //ClrWdt();
-    // __delay_us(500);//200
-    //ClrWdt();
-    //__delay_ms(1);
-    for ( i = 0 ; i < len; i++)
-    {
-        //ClrWdt();
-        //UsartSend(pFrame[i]);
-    }
-    RX_MODE();  //默认接收
+    DelayMs(1);
+    
+     UART2_SendData(pFrame, len);
+     RX_MODE();  //默认接收
 }
 
 /***********************************************************

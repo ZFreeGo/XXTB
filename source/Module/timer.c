@@ -248,12 +248,13 @@ inline uint8_t IsOverTime(uint32_t startTime, uint32_t delayTime)
 /*------------------------------------------------------------------------------
   delays number of tick Systicks (happens every 1 ms)
  *------------------------------------------------------------------------------*/
-//__INLINE static void Delay (uint32_t dlyTicks) {
-//  uint32_t curTicks;
+__INLINE  void DelayMs (uint32_t dlyTicks) 
+{
+  uint32_t curTicks;
 
-//  curTicks = msTicks;
-//  while ((msTicks - curTicks) < dlyTicks);
-//}
+  curTicks = g_MsTicks;
+  while ((g_MsTicks - curTicks) < dlyTicks);
+}
 
 
 

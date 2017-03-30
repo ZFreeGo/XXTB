@@ -10,6 +10,8 @@
  * @version 0.01
  */
 #include <LPC17xx.H> 
+#include <string.h>
+
 #include "DeviceNet.h"
 #include "can.h"
 #include "timer.h"
@@ -29,7 +31,7 @@ void InitYongciAData(void);
 static BOOL MakeUnconnectVisibleRequestMessageOnlyGroup2(struct DefFrameData* pFrame, 
     BYTE destMAC,BYTE serverCode, BYTE config);
 static void EstablishConnection(struct DefStationElement* pStation, USINT connectType);
-
+static BOOL MakeIOMessage(struct DefFrameData* pFrame, BYTE destMAC, BYTE* pData, BYTE datalen);
 ////////////////////////////////////////////////////////////可考虑存入EEPROM
 UINT  providerID = 0X1234;               // 供应商ID 
 UINT  device_type = 0;                   // 通用设备
@@ -74,7 +76,7 @@ static BYTE  SendDataBuffer5[10] = {0};    //发送缓冲数据
 /**
  *  列表中对应的子站列表
  */
-static struct DefStationElement StationList[STATION_COUNT];
+ struct DefStationElement StationList[STATION_COUNT];
 
 
 
@@ -207,8 +209,26 @@ void InitDeviceNet(void)
     InitSlaveStationData();
      g_pCurrrentStation = StationList; //当前指针变量指向从站第一站点
 }
-
-
+/**
+ * DeviceNet 打包数据发送
+ *
+ * @param   pStation 指向站点信息
+ * 
+ * @param   pData    指向数据包指针
+ *
+ * @param   type     生成报文类型
+ *
+ * @bref    DeviceNet 发送IO报文数据
+ */
+void DeviceNetSendIOData( struct DefStationElement* pStation, USINT* pData, USINT datalen)
+{
+    BYTE result = MakeIOMessage( &pStation->SendFrame, pStation->StationInformation.macID, pData,  datalen);
+    if (result)
+    {
+        SendData( &pStation->SendFrame);
+        pStation->SendFrame.waitFlag = TRUE;
+    }       
+}
 
 
 /**
@@ -233,6 +253,9 @@ static void EstablishConnection(struct DefStationElement* pStation, USINT connec
         while(TRUE);
     }  
 }
+
+
+
 
 /**
  * 单个支线任务
@@ -270,7 +293,7 @@ static void NormalTask(struct DefStationElement* pStation)
                 pStation->StationInformation.delayTime = 1000;//1000mS超时间
             }
             
-            EstablishConnection(pStation, VISIBLE_MSG);          
+            EstablishConnection(pStation, VISIBLE_MSG); //建立显示连接         
             break;
         }
         case STEP_LINKING: //正在建立连接
@@ -284,7 +307,7 @@ static void NormalTask(struct DefStationElement* pStation)
             {
                 pStation->StationInformation.delayTime = 1000;//1000mS超时间
             }
-            EstablishConnection(pStation, CYC_INQUIRE);
+            EstablishConnection(pStation, CYC_INQUIRE); //建立循环连接
             break;
         }
         case STEP_CYCLE: //循环建立连接
@@ -308,6 +331,10 @@ void MainDeviceNetTask(void)
     
         for(USINT i = 0; i < STATION_COUNT; i++)//STATION_COUNT
         {
+            if (StationList[i].StationInformation.enable != TRUE)
+            {
+                continue;
+            }
               //是否超时，时间是否到。
               if (StationList[i].StationInformation.enable  && IsOverTime(StationList[i].StationInformation.startTime, StationList[i].StationInformation.delayTime) )
               {
@@ -455,6 +482,31 @@ static BOOL MakeUnconnectVisibleRequestMessageOnlyGroup2(struct DefFrameData* pF
        pFrame->len = 6;
        pFrame->complteFlag = TRUE;
        return TRUE;
+   }
+   return FALSE;
+}
+/**
+ * 生成主站IO报文(GROUP2_POLL_STATUS_CYCLE)消息
+ *
+ * @param   pFrame     指向报文数据的指针,长度指针表示所指向缓冲区的最小长度
+ * @param   destMAC    目的MAC地址
+ * @param   pData      数据指针
+ * @param   datalen    数据长度
+ * @return  <code>TRUE</code>   生成成功
+ *          <code>FASLE</code>  生成失败 
+ */
+static BOOL MakeIOMessage(struct DefFrameData* pFrame, BYTE destMAC, BYTE* pData, BYTE datalen)
+{
+   if ((pFrame->len >= 6) && (pFrame->complteFlag == 0))
+   {
+       if (datalen <= 8)
+       {
+           pFrame->ID = MAKE_GROUP2_ID(GROUP2_POLL_STATUS_CYCLE, destMAC);
+           memcpy(pFrame->pBuffer, pData, datalen);//拷贝数据，要求源地址与目的地址范围没有冲突。           
+           pFrame->len = datalen;
+           pFrame->complteFlag = TRUE;
+           return TRUE;
+       }     
    }
    return FALSE;
 }
@@ -616,6 +668,8 @@ BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
    
     if (((*pID) & 0x07C0) <= 0x3C0) //Group1
     {
+        BYTE  mac = GET_GROUP2_MAC(*pID);
+        
         
     }
     else if (((*pID) & 0x0600) == 0x0400) //Group2
@@ -659,6 +713,7 @@ BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
                
                 break;
             }
+            
         }
     }
     else

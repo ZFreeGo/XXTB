@@ -210,8 +210,14 @@ struct DefFrameData
 //生成GROUP2 ID
 #define MAKE_GROUP2_ID(  function,mac_id)  (DINT)( (0x0400) | ((DINT)(mac_id &0x3F)<<3) | (function & 0x07))
 
+
+#ifndef FALSE
 #define FALSE (BYTE)0
+#endif
+
+#ifndef TRUE
 #define TRUE (BYTE)0xFF
+#endif
 
 /**
  * 站点状态属性
@@ -271,6 +277,11 @@ extern void InitDeviceNet(void);
 extern void DeviceNetTask(void);
 
 extern void MainDeviceNetTask(void);
+
+
+//应用层定义
+extern struct DefStationElement StationList[STATION_COUNT];
+extern void DeviceNetSendIOData( struct DefStationElement* pStation, USINT* pData, USINT datalen);
 
 
 #ifdef	__cplusplus

@@ -5,8 +5,8 @@
  * Created on 2014年12月4日, 上午7:27
  */
 
-#ifndef RTUFRAME_H
-#define	RTUFRAME_H
+#ifndef __RTUFRAME_H
+#define	__RTUFRAME_H
 
 #include <stdint.h>
 

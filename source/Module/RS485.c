@@ -85,8 +85,7 @@ void UART2_IRQ_Send(void)
     while (!(LPC_UART2->LSR & 0x20));   //等待THER为空
 
     LPC_UART2->IER &= 0x01;  //关闭发送中断
-    TX_MODE();      //开启发送
-    //Delay_ms(1);    //稳定时间
+   
     
     for(i = 0;i < TXlen;i++)
     {
@@ -95,7 +94,7 @@ void UART2_IRQ_Send(void)
         while(!(LPC_UART2->LSR & 0x40));
     }
 
-    RX_MODE();  //默认接收
+  
 
 }
 /***********************************************************
