@@ -11,4 +11,7 @@ typedef struct TagPointUint8
     uint8_t len; //指向数据的长度
 }PointUint8;
 
+
+#define UP_ADDRESS 0xA1
+
 #endif

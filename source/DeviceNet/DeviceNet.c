@@ -16,11 +16,12 @@
 #include "can.h"
 #include "timer.h"
 #include "RTuframe.h"
-
+#include "Header.h"
 
 #define STEP_START        0xA1 //启动状态,上电初始状态
 #define STEP_LINKING      0xA2 //正在建立连接中
-#define STEP_CYCLE        0xA4 //循环模式
+#define STEP_STATUS_CHANGE        0xA4 //STATUS CHANGE模式
+#define STEP_CYCLE        0xA8 //循环模式
 
 
 
@@ -313,15 +314,30 @@ static void NormalTask(struct DefStationElement* pStation)
             {
                 pStation->StationInformation.delayTime = 1000;//1000mS超时间
             }
-            EstablishConnection(pStation, CYC_INQUIRE); //建立循环连接
+            EstablishConnection(pStation, STEP_STATUS_CHANGE); //建立循环连接
             break;
         }
+        case STEP_STATUS_CHANGE://建立状态改变连接
+        {
+             pStation->StationInformation.startTime = g_MsTicks; 
+            if( pStation->StationInformation.OverTimeCount > 3)
+            {
+                pStation->StationInformation.delayTime = 3000;//1000mS超时间
+            }
+            else
+            {
+                pStation->StationInformation.delayTime = 1000;//1000mS超时间
+            }
+            EstablishConnection(pStation, STEP_CYCLE); //建立循环连接
+        }
+        
         case STEP_CYCLE: //循环建立连接
         {
             pStation->StationInformation.startTime = g_MsTicks; 
             pStation->StationInformation.delayTime = 1000;//1000mS超时间
             break;
         }
+       
     }   
 }
 
@@ -358,7 +374,7 @@ void MainDeviceNetTask(void)
  *
  * @bref   通过站点MACID获取相应的站点信息指针，没有则返回<code>null</code>
  */
-static struct DefStationElement* GetStationPoint(USINT macID)
+struct DefStationElement* GetStationPoint(USINT macID)
 {
     for (USINT i =0 ; i < STATION_COUNT; i++)
     {
@@ -420,15 +436,21 @@ static void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
         {
             //配置连接字
             pStation->StationInformation.state |=  pStation->SendFrame.pBuffer[4];             
-            
-            if (pStation->StationInformation.state & CYC_INQUIRE) //若建立轮询连接则进入轮询连接建立步骤
+            if (pStation->StationInformation.state & CYC_INQUIRE ) //建立轮询连接
             {
                 pStation->StationInformation.step = STEP_CYCLE;
                 pStation->SendFrame.waitFlag = FALSE;
                 pStation->StationInformation.endTime = g_MsTicks; //设置结束时间
                 pStation->StationInformation.complete = TRUE;
             }
-            else if (pStation->StationInformation.state & VISIBLE_MSG) //若建立显示连接则进入轮询连接建立步骤
+            else if (pStation->StationInformation.state &  STEP_STATUS_CHANGE ) //建立状态改变连接
+            {
+                pStation->StationInformation.step = STEP_CYCLE;
+                pStation->SendFrame.waitFlag = FALSE;
+                pStation->StationInformation.endTime = g_MsTicks; //设置结束时间
+                pStation->StationInformation.complete = TRUE;
+            }
+            else if (pStation->StationInformation.state & VISIBLE_MSG) //建立显示连接
             {
                 pStation->StationInformation.step = STEP_LINKING;
                 pStation->SendFrame.waitFlag = FALSE;
@@ -473,10 +495,21 @@ static void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
  */
 static void SlaveStationStatusCycleService(WORD* pID, BYTE* pbuff, BYTE len)
 {
-     USINT sendData[16] = {0};
-     USINT datalen = 0;
-     GenRTUFrame(0x1A, 1, pbuff, len,sendData, &datalen);
-     SendFrame(sendData, datalen);  
+    BYTE  mac = GET_GROUP1_MAC(*pID);
+    struct DefStationElement* pStation =  GetStationPoint(mac);
+    if (pStation != 0)
+    {
+        //检测是否已经建立循环连接
+        if((pStation->StationInformation.state & CYC_INQUIRE) ==CYC_INQUIRE )
+        {
+            USINT sendData[16] = {0};
+            USINT datalen = 0;
+            GenRTUFrame(UP_ADDRESS, 1, pbuff, len,sendData, &datalen);
+            SendFrame(sendData, datalen);  
+        }
+    }
+     
+   
 }
 
 /**
@@ -689,7 +722,7 @@ BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
    
     if (((*pID) & 0x07C0) <= 0x3C0) //Group1
     {
-        BYTE  mac = GET_GROUP1_MAC(*pID);
+        
         BYTE  function = GET_GROUP1_FUNCTION(*pID);
         switch(function)
         {
@@ -780,4 +813,9 @@ void RestartEstablishLink(uint8_t loop)
         StationList[loop].StationInformation.state = 0;       
     }
 }
+
+
+
+
+
 

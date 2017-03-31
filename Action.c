@@ -24,7 +24,7 @@ void ExecuteFunctioncode(frameRtu* pRtu)
         SendFrame(SendDataBuffer, len);     
         switch(pRtu->funcode)
         {
-            case 0:
+            case 1://CAN转发包
             {
                FrameServer( pRtu->pData + 3, pRtu->datalen, 0);
                break;
@@ -62,33 +62,45 @@ void ExecuteFunctioncode(frameRtu* pRtu)
  */
 static void FrameServer(uint8_t* pData, uint8_t  len, uint8_t mac_id)
 {
-    if(len >= 1) //至少1个字节
+    if(len >= 3) //至少1+2个字节//为MAC地址
     {
-        switch(pData[0])
-        {
-
-            case 1://合闸预制
-            case 2://合闸同步
-            case 3://分闸预制
-            case 4://分闸同步
+        
+        struct DefStationElement* pStation = GetStationPoint(pData[0]);
+        if (pStation != 0)
+        {        
+            len = len - 2;//仅考虑有效数据
+            pData = pData + 2;//2bytes 偏移
+            
+            switch(pData[0])//0 1 2
             {
-                if(len >= 3) //至少3个字节
+                case 1://合闸预制
+                case 2://合闸同步
+                case 3://分闸预制
+                case 4://分闸同步
                 {
-                    DeviceNetSendIOData(StationList, pData, len);//发送IO报文
+                    if(len >= 3) //至少3个字节
+                    {
+                        DeviceNetSendIOData(pStation, pData, len);//发送IO报文
+                    }
+                    break;
                 }
-                break;
-            }
-            case 5://同步合闸预制
-            {
-                if(len >= 2) //至少2个字节
+                case 5://同步合闸预制
                 {
-                    DeviceNetSendIOData(StationList, pData, len);//发送IO报文
+                    if(len >= 2) //至少2个字节
+                    {
+                        DeviceNetSendIOData(pStation, pData, len);//发送IO报文
+                    }
+                    break;
                 }
-                break;
-            }
-            case 6://同步分闸预制
-            {
-                break;
+                default://直接转发
+                {
+                    if(len <= 8)//小于8直接转发
+                    {
+                        DeviceNetSendIOData(pStation, pData, len);//发送IO报文
+                    }
+                    break;
+                }
+               
             }
         }
     }

@@ -17,10 +17,10 @@
 extern "C" {
 #endif /* __cplusplus */
 
-
-#define BIT_STROKE  0x04    //位选通
-#define CYC_INQUIRE	0x02    //定义CYC_INQUIRE，IO轮询
-#define VISIBLE_MSG	0x01    //显式信息连接
+#define STATUS_CHANGE  0x10    //状态改变
+#define BIT_STROKE     0x04    //位选通
+#define CYC_INQUIRE	   0x02    //定义CYC_INQUIRE，IO轮询
+#define VISIBLE_MSG	   0x01    //显式信息连接
 
 /////////////数据类型///////////////////////
 typedef unsigned char BOOL;      //1BYTE
@@ -266,6 +266,12 @@ struct DefStationElement
 #define STATION_COUNT  6//站点数量
 
 
+//IO报文分段协议定义
+#define FIRST_MESSAGE    0
+#define ONE_MESSAGE      0x3F
+#define MIDDLE_MESSAGE   1
+#define LAST_MESSAGE     2
+#define ACK_MESSAGE      3
 
 
 
@@ -285,7 +291,7 @@ extern struct DefStationElement StationList[STATION_COUNT];
 extern void DeviceNetSendIOData( struct DefStationElement* pStation, USINT* pData, USINT datalen);
 
 extern void RestartEstablishLink(uint8_t loop);
-
+extern struct DefStationElement* GetStationPoint(USINT macID);
 #ifdef	__cplusplus
 }
 #endif /* __cplusplus */
