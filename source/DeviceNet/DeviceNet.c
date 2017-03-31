@@ -342,7 +342,7 @@ void MainDeviceNetTask(void)
                 continue;
             }
               //是否超时，时间是否到。
-              if (StationList[i].StationInformation.enable  && IsOverTime(StationList[i].StationInformation.startTime, StationList[i].StationInformation.delayTime) )
+              if (IsOverTime(StationList[i].StationInformation.startTime, StationList[i].StationInformation.delayTime) )
               {
                   NormalTask(StationList + i);
               }        
@@ -759,5 +759,25 @@ BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
    
     return 0;
 }
-
+/**
+ * 复位连接 
+ *
+ * @param  loop     指定重新建立连接的回路 
+ * @return          null
+ */
+void RestartEstablishLink(uint8_t loop)
+{
+    if(loop < STATION_COUNT)
+    {
+        StationList[loop].StationInformation.step = STEP_START;
+        StationList[loop].StationInformation.complete = TRUE;
+        StationList[loop].StationInformation.startTime = g_MsTicks;
+        StationList[loop].StationInformation.delayTime = 300;
+        StationList[loop].StationInformation.endTime = 0;
+        StationList[loop].StationInformation.OverTimeCount = 0;
+        
+        StationList[loop].StationInformation.online = 0;
+        StationList[loop].StationInformation.state = 0;       
+    }
+}
 

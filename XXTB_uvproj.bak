@@ -533,11 +533,6 @@
           <GroupName>SerialPort</GroupName>
           <Files>
             <File>
-              <FileName>Action.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\source\DeviceNet\Action.c</FilePath>
-            </File>
-            <File>
               <FileName>Action.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\source\DeviceNet\Action.h</FilePath>
@@ -561,6 +556,11 @@
               <FileName>RtuFrame.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\source\DeviceNet\RtuFrame.h</FilePath>
+            </File>
+            <File>
+              <FileName>Action.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Action.c</FilePath>
             </File>
           </Files>
         </Group>

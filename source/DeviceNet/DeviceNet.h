@@ -284,6 +284,7 @@ extern void MainDeviceNetTask(void);
 extern struct DefStationElement StationList[STATION_COUNT];
 extern void DeviceNetSendIOData( struct DefStationElement* pStation, USINT* pData, USINT datalen);
 
+extern void RestartEstablishLink(uint8_t loop);
 
 #ifdef	__cplusplus
 }

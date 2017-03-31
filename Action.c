@@ -6,7 +6,7 @@
 uint8_t SendDataBuffer[64] = {0};
 
 static void FrameServer(uint8_t* pData, uint8_t  len, uint8_t mac_id);
-
+static void MasterStationServer(PointUint8* pData);
 /**
  * 执行功能代码
  *
@@ -31,7 +31,11 @@ void ExecuteFunctioncode(frameRtu* pRtu)
             }
             case 0x10://控制ARM部分
             {
+                PointUint8 Point;
+                Point.pData = pRtu->pData + 3;
+                Point.len = pRtu->datalen;
                 
+                MasterStationServer(&Point);
                 break;
             }
             
@@ -58,31 +62,35 @@ void ExecuteFunctioncode(frameRtu* pRtu)
  */
 static void FrameServer(uint8_t* pData, uint8_t  len, uint8_t mac_id)
 {
-    if(len >= 3) //至少3个字节
+    if(len >= 1) //至少1个字节
     {
-    switch(pData[0])
-    {
+        switch(pData[0])
+        {
 
-        case 1://合闸预制
-        case 2://合闸同步
-        case 3://分闸预制
-        case 4://分闸同步
-        {
-            if(len >= 3) //至少3个字节
+            case 1://合闸预制
+            case 2://合闸同步
+            case 3://分闸预制
+            case 4://分闸同步
             {
-                DeviceNetSendIOData(StationList, pData, len);//发送IO报文
+                if(len >= 3) //至少3个字节
+                {
+                    DeviceNetSendIOData(StationList, pData, len);//发送IO报文
+                }
+                break;
             }
-            break;
+            case 5://同步合闸预制
+            {
+                if(len >= 2) //至少2个字节
+                {
+                    DeviceNetSendIOData(StationList, pData, len);//发送IO报文
+                }
+                break;
+            }
+            case 6://同步分闸预制
+            {
+                break;
+            }
         }
-        case 5://同步合闸预制
-        {
-            break;
-        }
-        case 6://同步分闸预制
-        {
-            break;
-        }
-    }
     }
 }
 
@@ -93,7 +101,7 @@ static void FrameServer(uint8_t* pData, uint8_t  len, uint8_t mac_id)
  * @param  数据信息长度
  * @param  mac id
  *
- * @bref   对完整帧进行提取判断
+ * @brief   对完整帧进行提取判断
  */
 static void MasterStationServer(PointUint8* pData)
 {
@@ -104,9 +112,15 @@ static void MasterStationServer(PointUint8* pData)
     uint8_t function = pData->pData[0];
     switch(function)
     {
-        case 1://重新建立
+        case 1://重新所有连接建立
         {
-            
+            RestartEstablishLink(0);
+            break;
+        }
+        case 0x40://复位ARM
+        {
+            NVIC_SystemReset();
+            break;
         }
     }
     
