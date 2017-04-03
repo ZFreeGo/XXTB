@@ -5,6 +5,7 @@
 
 uint8_t SendDataBuffer[64] = {0};
 
+
 static void FrameServer(uint8_t* pData, uint8_t  len, uint8_t mac_id);
 static void MasterStationServer(PointUint8* pData);
 /**
@@ -20,16 +21,16 @@ void ExecuteFunctioncode(frameRtu* pRtu)
     {
       
         uint8_t len = 0;
-        GenRTUFrame(0x1A, pRtu->funcode, pRtu->pData + 3, pRtu->datalen,SendDataBuffer, &len);
+        GenRTUFrame(UP_ADDRESS, pRtu->funcode, pRtu->pData + 3, pRtu->datalen,SendDataBuffer, &len);
         SendFrame(SendDataBuffer, len);     
         switch(pRtu->funcode)
         {
-            case 1://CAN转发包
+            case CAN_MESSAGE_TO_DOWN://CAN转发包
             {
                FrameServer( pRtu->pData + 3, pRtu->datalen, 0);
                break;
             }
-            case 0x10://控制ARM部分
+            case DOWN_CONCTROL://控制ARM部分
             {
                 PointUint8 Point;
                 Point.pData = pRtu->pData + 3;
@@ -37,8 +38,7 @@ void ExecuteFunctioncode(frameRtu* pRtu)
                 
                 MasterStationServer(&Point);
                 break;
-            }
-            
+            }            
             default :
              {
                             
@@ -58,7 +58,7 @@ void ExecuteFunctioncode(frameRtu* pRtu)
  * @param  数据信息长度
  * @param  mac id
  *
- * @bref   对完整帧进行提取判断
+ * @brief   对完整帧进行提取判断
  */
 static void FrameServer(uint8_t* pData, uint8_t  len, uint8_t mac_id)
 {
@@ -126,7 +126,10 @@ static void MasterStationServer(PointUint8* pData)
     {
         case 1://重新所有连接建立
         {
-            RestartEstablishLink(0);
+            if (pData->len == 2)
+            {
+                RestartEstablishLink( pData->pData[1]);
+            }
             break;
         }
         case 0x40://复位ARM

@@ -145,14 +145,14 @@ static void InitSlaveStationData(void)
     StationList[0].StationInformation.macID = 0x10; //永磁控制器A
     StationList[1].StationInformation.macID = 0x12; //永磁控制器B
     StationList[2].StationInformation.macID = 0x14; //永磁控制器C
-    StationList[3].StationInformation.macID = 0x18; //监控A
+    StationList[3].StationInformation.macID = 0x0D; //DSP控制器
     StationList[4].StationInformation.macID = 0x1A; //监控B
     StationList[5].StationInformation.macID = 0x1C; //监控C
 
     StationList[0].StationInformation.enable = TRUE;
     StationList[1].StationInformation.enable = FALSE;
     StationList[2].StationInformation.enable = FALSE;
-    StationList[3].StationInformation.enable = FALSE;
+    StationList[3].StationInformation.enable = TRUE;
     StationList[4].StationInformation.enable = FALSE;
     StationList[5].StationInformation.enable = FALSE;     
 }
@@ -163,7 +163,7 @@ static void InitMasterStationData(void)
 {
     
     //////////初始化DeviceNetObj对象////////////////////////////////
-	DeviceNetObj.MACID =0x0A;                   //如果跳键没有设置从站地址，默认主站地址0x02            
+	DeviceNetObj.MACID =0x02;                   //            
 	DeviceNetObj.baudrate = 2;                   //500Kbit/s
 	DeviceNetObj.assign_info.select = 0;         //初始的配置选择字节清零
 	DeviceNetObj.assign_info.master_MACID =0x0A; //默认主站地址，在预定义主从连接建立过程中，主站还会告诉从站：主站的地址
@@ -314,7 +314,7 @@ static void NormalTask(struct DefStationElement* pStation)
             {
                 pStation->StationInformation.delayTime = 1000;//1000mS超时间
             }
-            EstablishConnection(pStation, STEP_STATUS_CHANGE); //建立循环连接
+            EstablishConnection(pStation, STATUS_CHANGE); //建立循环连接
             break;
         }
         case STEP_STATUS_CHANGE://建立状态改变连接
@@ -328,7 +328,7 @@ static void NormalTask(struct DefStationElement* pStation)
             {
                 pStation->StationInformation.delayTime = 1000;//1000mS超时间
             }
-            EstablishConnection(pStation, STEP_CYCLE); //建立循环连接
+            EstablishConnection(pStation, CYC_INQUIRE); //建立循环连接
         }
         
         case STEP_CYCLE: //循环建立连接
@@ -443,9 +443,9 @@ static void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
                 pStation->StationInformation.endTime = g_MsTicks; //设置结束时间
                 pStation->StationInformation.complete = TRUE;
             }
-            else if (pStation->StationInformation.state &  STEP_STATUS_CHANGE ) //建立状态改变连接
+            else if (pStation->StationInformation.state &  STATUS_CHANGE ) //建立状态改变连接
             {
-                pStation->StationInformation.step = STEP_CYCLE;
+                pStation->StationInformation.step = STEP_STATUS_CHANGE;
                 pStation->SendFrame.waitFlag = FALSE;
                 pStation->StationInformation.endTime = g_MsTicks; //设置结束时间
                 pStation->StationInformation.complete = TRUE;
@@ -503,8 +503,12 @@ static void SlaveStationStatusCycleService(WORD* pID, BYTE* pbuff, BYTE len)
         if((pStation->StationInformation.state & CYC_INQUIRE) ==CYC_INQUIRE )
         {
             USINT sendData[16] = {0};
+            USINT tempData[16] = {0};
             USINT datalen = 0;
-            GenRTUFrame(UP_ADDRESS, 1, pbuff, len,sendData, &datalen);
+            tempData[0] = mac;//添加上传信息
+            tempData[1] = 0xAA;
+            memcpy(tempData + 2, pbuff, len);//拷贝数据，要求源地址与目的地址范围没有冲突。
+            GenRTUFrame(UP_ADDRESS, CAN_MESSAGE_TO_UP, tempData, len + 2,sendData, &datalen);
             SendFrame(sendData, datalen);  
         }
     }
@@ -765,15 +769,8 @@ BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
                     ResponseMACID(&MasterStation.SendFrame, 0x80);       //重复MACID检查响应函数,应答，物理端口为0
                 }
                 else
-                {
-                     for(USINT i = 0; i < STATION_COUNT; i++)
-                    {
-                        if(StationList[i].StationInformation.macID== mac)
-                        {
-                            StationList[i].StationInformation.online = TRUE;
-                            StationList[i].StationInformation.state = 0;
-                        }
-                    }
+                {                     
+                    RestartEstablishLink(mac);
                 }
                
                 break;
@@ -795,23 +792,25 @@ BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
 /**
  * 复位连接 
  *
- * @param  loop     指定重新建立连接的回路 
+ * @param  mac     指定mac指定重新建立连接的回路 
  * @return          null
  */
-void RestartEstablishLink(uint8_t loop)
+void RestartEstablishLink(uint8_t mac)
 {
-    if(loop < STATION_COUNT)
+    struct DefStationElement* pStation = GetStationPoint(mac);
+    if ( pStation != 0)
     {
-        StationList[loop].StationInformation.step = STEP_START;
-        StationList[loop].StationInformation.complete = TRUE;
-        StationList[loop].StationInformation.startTime = g_MsTicks;
-        StationList[loop].StationInformation.delayTime = 300;
-        StationList[loop].StationInformation.endTime = 0;
-        StationList[loop].StationInformation.OverTimeCount = 0;
+        pStation->StationInformation.step = STEP_START;
+        pStation->StationInformation.complete = TRUE;
+        pStation->StationInformation.startTime = g_MsTicks;
+        pStation->StationInformation.delayTime = 300;
+        pStation->StationInformation.endTime = 0;
+        pStation->StationInformation.OverTimeCount = 0;
         
-        StationList[loop].StationInformation.online = 0;
-        StationList[loop].StationInformation.state = 0;       
-    }
+        pStation->StationInformation.online = 0;
+        pStation->StationInformation.state = 0;     
+    }        
+    
 }
 
 
