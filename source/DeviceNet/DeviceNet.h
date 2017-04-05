@@ -12,6 +12,12 @@
 #define	XC_HEADER_TEMPLATE_H
 
 
+#include "Header.h"
+
+#define LOCAL_MAC  0x02
+
+
+
 
 #ifdef	__cplusplus
 extern "C" {
@@ -262,6 +268,18 @@ struct DefStationElement
     struct DefStationInformation StationInformation;
 };
 
+/**
+ *同步状态控制
+ */
+typedef struct TagSynchronousControl
+{
+    uint32_t startTime; //启动时间
+    uint32_t delayTime; // 延时时间
+    uint16_t readyBit;//同步等待bit
+    uint16_t readyAction;//ready 准备执行 TRUE--可以接收执行命令，FALSE--不可以接收执行命令 
+}SynchronousControl;
+
+
 
 #define STATION_COUNT  6//站点数量
 
@@ -272,6 +290,11 @@ struct DefStationElement
 #define MIDDLE_MESSAGE   1
 #define LAST_MESSAGE     2
 #define ACK_MESSAGE      3
+
+
+//地址索引
+#define SYNCHRONIZATION_INDEX  3    //同步控制器索引（DSP）
+#define LOCAL_INDEX            STATION_COUNT   //本机索引
 
 
 
@@ -286,12 +309,19 @@ extern void DeviceNetTask(void);
 extern void MainDeviceNetTask(void);
 
 
-//应用层定义
+//应用层定义---数据部分
 extern struct DefStationElement StationList[STATION_COUNT];
-extern void DeviceNetSendIOData( struct DefStationElement* pStation, USINT* pData, USINT datalen);
+extern uint8_t MacList[STATION_COUNT + 1];
 
+//应用层定义---函数部分
+extern void DeviceNetSendIOData( struct DefStationElement* pStation, USINT* pData, USINT datalen);
 extern void RestartEstablishLink(uint8_t loop);
 extern struct DefStationElement* GetStationPoint(USINT macID);
+extern uint8_t  SynchronousOperationReady(PointUint8* pData, PointUint8* pCommand);
+extern uint8_t  SynchronousOperationAction(PointUint8* pData, PointUint8* pCommand);
+extern void CheckDeviceNetWorkMode(void);
+
+
 #ifdef	__cplusplus
 }
 #endif /* __cplusplus */

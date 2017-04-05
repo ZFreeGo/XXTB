@@ -46,11 +46,33 @@ void CanInit (void)
 }
 frameRtu sendFrame, recvFrame;
 
+typedef struct TagConfigData
+{
+    uint8_t ID; //ID号
+    void* pData;//指向数据
+    uint8_t type;//类型    
+}ConfigData;
+
+float A = 1.234 ,C = 0;
+uint8_t B = 0;
 /**
  * main主函数 
  */
 int main (void) 
 {
+    ConfigData config[3];
+    config[0].ID = 1;
+    config[0].pData = &SendFrame;
+    config[0].type = 3;
+    config[1].ID = 2;
+    config[1].pData = &A;
+    config[1].type = 4;
+    config[0].ID = 3;
+    config[0].pData = &B;
+    config[0].type = 6;
+    
+    C = *(float*)config[1].pData;
+    
     uint16_t led1 = 0;
     uint16_t led2 = 1; 
     uint16_t result = 0;
@@ -81,13 +103,8 @@ int main (void)
         {
             ExecuteFunctioncode(&recvFrame);
         }
-    }
-    
-    
-   // while(1);
-
-    
-  
-  
+        CheckDeviceNetWorkMode();    
+    }    
+   // while(1);         
 }
 

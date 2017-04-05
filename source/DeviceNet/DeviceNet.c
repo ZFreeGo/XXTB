@@ -24,6 +24,16 @@
 #define STEP_CYCLE        0xA8 //循环模式
 
 
+/**
+ *工作模式  bit 1,0--正常模式，bit 3,2--同步预制模式， bit 5,4--同步执行模式
+ */
+#define WORK_READY_SYN    0x000C //准备同步
+#define WORK_ACTION_SYN   0x0030 //执行同步
+#define SET_WORK_MODE(mode)    {WorkMode |= (uint16_t)(mode);}
+#define CLREA_WORK_MODE(mode)  {WorkMode &= ~((uint16_t)(mode));}
+#define WORK_MODE_RUNING(mode) ((WorkMode & (uint16_t)(mode)) == (uint16_t)(mode))
+
+uint16_t WorkMode = 0;
 
 
 BOOL IsTimeRemain(void);    //需要根据具体平台改写
@@ -36,6 +46,11 @@ static BOOL MakeUnconnectVisibleRequestMessageOnlyGroup2(struct DefFrameData* pF
 static void EstablishConnection(struct DefStationElement* pStation, USINT connectType);
 static BOOL MakeIOMessage(struct DefFrameData* pFrame, BYTE destMAC, BYTE* pData, BYTE datalen);
 static void SlaveStationStatusCycleService(WORD* pID, BYTE* pbuff, BYTE len);
+
+uint8_t  SynchronousOperationReadyACK(struct DefStationElement* pStation, BYTE* pbuff, BYTE len);
+uint8_t  SynchronousOperationActionACK(struct DefStationElement* pStation, BYTE* pbuff, BYTE len);
+uint8_t  SynchronousOperationReady(PointUint8* pData, PointUint8* pCommand);
+uint8_t  SynchronousOperationAction(PointUint8* pData, PointUint8* pCommand);
 ////////////////////////////////////////////////////////////可考虑存入EEPROM
 UINT  providerID = 0X1234;               // 供应商ID 
 UINT  device_type = 0;                   // 通用设备
@@ -82,13 +97,15 @@ static BYTE  SendDataBuffer5[10] = {0};    //发送缓冲数据
  */
  struct DefStationElement StationList[STATION_COUNT];
 
-
+/**
+ * MAC地址合集,小于STATION_COUNT 为子站，等于STATION_COUNT为本机
+ */
+uint8_t MacList[STATION_COUNT + 1];
 
 /**
  * 当前处理所指向的子站指针
  */
 struct DefStationElement*    g_pCurrrentStation; 
-
 
 
 
@@ -142,12 +159,12 @@ static void InitSlaveStationData(void)
         StationList[i].StationInformation.online = 0;
         StationList[i].StationInformation.state = 0;       
     }
-    StationList[0].StationInformation.macID = 0x10; //永磁控制器A
-    StationList[1].StationInformation.macID = 0x12; //永磁控制器B
-    StationList[2].StationInformation.macID = 0x14; //永磁控制器C
-    StationList[3].StationInformation.macID = 0x0D; //DSP控制器
-    StationList[4].StationInformation.macID = 0x1A; //监控B
-    StationList[5].StationInformation.macID = 0x1C; //监控C
+    StationList[0].StationInformation.macID =  MacList[0]; //永磁控制器A
+    StationList[1].StationInformation.macID =  MacList[1]; //永磁控制器B
+    StationList[2].StationInformation.macID =  MacList[2]; //永磁控制器C
+    StationList[3].StationInformation.macID =  MacList[3]; //DSP控制器
+    StationList[4].StationInformation.macID =  MacList[4]; //监控B
+    StationList[5].StationInformation.macID =  MacList[5]; //监控C
 
     StationList[0].StationInformation.enable = TRUE;
     StationList[1].StationInformation.enable = FALSE;
@@ -163,7 +180,7 @@ static void InitMasterStationData(void)
 {
     
     //////////初始化DeviceNetObj对象////////////////////////////////
-	DeviceNetObj.MACID =0x02;                   //            
+	DeviceNetObj.MACID =   MacList[STATION_COUNT];      //            
 	DeviceNetObj.baudrate = 2;                   //500Kbit/s
 	DeviceNetObj.assign_info.select = 0;         //初始的配置选择字节清零
 	DeviceNetObj.assign_info.master_MACID =0x0A; //默认主站地址，在预定义主从连接建立过程中，主站还会告诉从站：主站的地址
@@ -195,7 +212,9 @@ static void InitMasterStationData(void)
     MasterStation.StationInformation.OverTimeCount = 0;
     
     MasterStation.StationInformation.online = 0;
-    MasterStation.StationInformation.state = 0;   
+    MasterStation.StationInformation.state = 0; 
+    
+    WorkMode = 0;
 }
 
 /**
@@ -203,6 +222,17 @@ static void InitMasterStationData(void)
  */
 void InitDeviceNet(void)
 {    
+    //地址赋值--可根据情况进行更新
+    MacList[0]= 0x10;//永磁控制器A
+    MacList[1]= 0x12;//永磁控制器B
+    MacList[2]= 0x14;//永磁控制器C
+    MacList[3]= 0x0D;//DSP控制器
+    
+    MacList[4]= 0x1A;//监控A
+    MacList[5]= 0x1C;//监控B
+    
+    MacList[6]= 0x02;//本机控制
+    
     InitMasterStationData();
   
     
@@ -482,39 +512,9 @@ static void SlaveStationVisibleMsgService(WORD* pID, BYTE * pbuff, BYTE len)
         }
        
     }
-    
-    
-    
+ 
 }
-/**
- * 从站从站IO轮询或状态变化/循环应答消息
- *
- * @param   pID     ID号指针
- * @param   pbuff   指向缓冲区数据指针
- * @param   len     缓冲区数据长度
- */
-static void SlaveStationStatusCycleService(WORD* pID, BYTE* pbuff, BYTE len)
-{
-    BYTE  mac = GET_GROUP1_MAC(*pID);
-    struct DefStationElement* pStation =  GetStationPoint(mac);
-    if (pStation != 0)
-    {
-        //检测是否已经建立循环连接
-        if((pStation->StationInformation.state & CYC_INQUIRE) ==CYC_INQUIRE )
-        {
-            USINT sendData[16] = {0};
-            USINT tempData[16] = {0};
-            USINT datalen = 0;
-            tempData[0] = mac;//添加上传信息
-            tempData[1] = 0xAA;
-            memcpy(tempData + 2, pbuff, len);//拷贝数据，要求源地址与目的地址范围没有冲突。
-            GenRTUFrame(UP_ADDRESS, CAN_MESSAGE_TO_UP, tempData, len + 2,sendData, &datalen);
-            SendFrame(sendData, datalen);  
-        }
-    }
-     
-   
-}
+
 
 /**
  * 生成仅限组2非连接显示请求信息
@@ -740,9 +740,7 @@ BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
                 break;
             }
         }
-        
-        
-        
+ 
     }
     else if (((*pID) & 0x0600) == 0x0400) //Group2
     {
@@ -812,7 +810,335 @@ void RestartEstablishLink(uint8_t mac)
     }        
     
 }
+/**
+ * 从站从站IO轮询或状态变化/循环应答消息
+ *
+ * @param   pID     ID号指针
+ * @param   pbuff   指向缓冲区数据指针
+ * @param   len     缓冲区数据长度
+ */
+static void SlaveStationStatusCycleService(WORD* pID, BYTE* pbuff, BYTE len)
+{
+    BYTE  mac = GET_GROUP1_MAC(*pID);
+    struct DefStationElement* pStation =  GetStationPoint(mac);
+    if (pStation != 0)
+    {
+        //检测是否已经建立循环连接
+        if((pStation->StationInformation.state & CYC_INQUIRE) ==CYC_INQUIRE )
+        {
+            //回传到上位机
+            USINT sendData[16] = {0};
+            USINT tempData[16] = {0};
+            USINT datalen = 0;
+            tempData[0] = mac;//添加上传信息
+            tempData[1] = 0xAA;
+            memcpy(tempData + 2, pbuff, len);//拷贝数据，要求源地址与目的地址范围没有冲突。
+            GenRTUFrame(UP_ADDRESS, CAN_MESSAGE_TO_UP, tempData, len + 2,sendData, &datalen);
+            SendFrame(sendData, datalen);  
+            
+            //是否为同步预制模式           
 
+            if (WORK_MODE_RUNING(WORK_READY_SYN))
+            {
+                SynchronousOperationReadyACK(pStation, pbuff, len);
+            }
+            
+            //是否为同步执行模式
+            if (WORK_MODE_RUNING(WORK_ACTION_SYN))
+            {
+                SynchronousOperationActionACK(pStation, pbuff, len);
+            }
+        }
+    }
+     
+   
+}
+/**
+ * 使能一般循环
+ */
+inline static void EnableNormalCycle(void)
+{
+     StationList[0].StationInformation.enable = TRUE;
+     StationList[1].StationInformation.enable = FALSE;
+     StationList[2].StationInformation.enable = FALSE;
+     StationList[SYNCHRONIZATION_INDEX].StationInformation.enable = TRUE;  
+}
+
+/**
+ * 禁止一般循环
+ */
+inline static void DisableNormalCycle(void)
+{
+     StationList[0].StationInformation.enable = FALSE;
+     StationList[1].StationInformation.enable = FALSE;
+     StationList[2].StationInformation.enable = FALSE;
+     StationList[SYNCHRONIZATION_INDEX].StationInformation.enable = FALSE;  
+}
+
+/**
+ * 同步状态控制
+ */
+static SynchronousControl SynchronousState;
+
+/**
+ * 复位连接 ，此函数若中断中调用，需注意发送与接收冲突问题。
+ *
+ * @param   pData     DSP命令控制字
+ * @param   pCommand  永磁控制器命令字
+ * @return            非0-错误代码，0--正确
+ */
+uint8_t  SynchronousOperationReady(PointUint8* pData, PointUint8* pCommand)
+{
+    uint8_t result = 0;
+    //Step 1： 检查当前状态是否适合同步————检查通讯是否正常,检查当前是否同步
+    
+    
+    //Step 2:  生成针对同步控制器IO报文    
+    if (pData->len < 4)//命令控制字至少4个字节
+    {
+        return 0xA1;
+    }
+    //成同步控制器预制命令(DSP)
+    StationList[SYNCHRONIZATION_INDEX].SendFrame.len = 8;
+    result = MakeIOMessage(&StationList[SYNCHRONIZATION_INDEX].SendFrame, MacList[SYNCHRONIZATION_INDEX], pData->pData, pData->len);        
+    if (result == FALSE)
+    {
+        return 0xA2;            
+    }
+    StationList[SYNCHRONIZATION_INDEX].SendFrame.waitFlag = TRUE;
+    StationList[SYNCHRONIZATION_INDEX].StationInformation.enable = FALSE; //轮询置位False，暂停一般轮询发送
+    //Step 3：置为同步模式 并 发送同步IO报文 
+    SET_WORK_MODE(WORK_READY_SYN); 
+     
+    SendData(&StationList[SYNCHRONIZATION_INDEX].SendFrame);
+    SynchronousState.startTime = g_MsTicks;
+    SynchronousState.delayTime = 2000;
+    SynchronousState.readyBit = 0;
+    SynchronousState.readyAction = FALSE;
+    //TODO:添加适当延时    
+    
+    //Step4 :针对其它控制器(永磁控制器)，执行同步操作
+    for(uint8_t i = 0; i < 3; i++)
+    {        
+        StationList[i].SendFrame.len = 8;
+        MakeIOMessage(&StationList[i].SendFrame, MacList[i], pCommand->pData, pCommand->len);        
+        SendData(&StationList[i].SendFrame);
+        StationList[i].SendFrame.waitFlag = TRUE;     
+       //TODO:添加适当延时        
+    } 
+    DisableNormalCycle();  //轮询置位False，暂停一般轮询发送
+    return 0;    
+    
+}
+/**
+ * 同步操作应答 
+ *
+ * @param  pStation   对应站点 
+ * @param  pbuff      接收缓冲数据
+ * @param  len        接收
+ * @return            非0-错误代码，0--正确
+ */
+uint8_t  SynchronousOperationReadyACK(struct DefStationElement* pStation, BYTE* pbuff, BYTE len)
+{
+    uint8_t i = 0;
+    //2S，超时判断
+   if(IsOverTime(SynchronousState.startTime, SynchronousState.delayTime))
+   {
+       SynchronousState.readyAction = TRUE; 
+       CLREA_WORK_MODE(WORK_READY_SYN);//清除 同步预制工作模式
+      
+        //恢复正常工作模式
+       EnableNormalCycle();
+       return 0xA1;
+   }
+   
+   //判断是否发送等待
+   if(pStation->SendFrame.waitFlag == 0)
+   {
+       return 0xA2;
+   }
+   //检测是否错误
+   if (pbuff[0] == 0x14)
+   {
+       //此处取消本次任务
+       
+       return 0xA3;
+   }
+   //正常应答数据仅仅是ID号与0x80相与，其它相同
+   //比较长度
+   if(pStation->SendFrame.len != len)
+   {
+       return 0xA4;
+   }
+   //比较是否为ID应答
+   if(pStation->SendFrame.pBuffer[0] != (pbuff[0] | 0x80))
+   {
+       return 0xA5;
+   }
+   for(i = 1; i < len; i++)
+   {
+       if(pStation->SendFrame.pBuffer[0] != pbuff[0])
+       {
+           return 0xA6;
+       }
+   }
+   //属于正常应答模式，置位就绪等待bit 
+   if(pStation->StationInformation.macID == MacList[0])
+   {
+       SynchronousState.readyBit |= 0x0001;
+   }
+   else  if (pStation->StationInformation.macID == MacList[SYNCHRONIZATION_INDEX])
+   {
+       SynchronousState.readyBit |= 0x0008;
+   }
+   //DSP与永磁控制A准备就绪
+   if (SynchronousState.readyBit == 0x0009) //此时说明可以接收合闸同步执行指令
+   {
+        SynchronousState.readyAction = TRUE; 
+        CLREA_WORK_MODE(WORK_READY_SYN);//清除 同步预制工作模式 
+        SET_WORK_MODE(WORK_ACTION_SYN);//  置位同步执行模式 
+        SynchronousState.startTime = g_MsTicks; //重新设计超时时间
+        SynchronousState.delayTime = 2000;
+        SynchronousState.readyBit = 0;
+     
+       return 0;
+   }
+   return 0;
+   
+}
+
+
+/**
+ * 同步操作执行
+ *
+ * @param   pData     DSP命令控制字
+ * @param   pCommand  永磁控制器命令字
+ * @return            非0-错误代码，0--正确
+ */
+uint8_t  SynchronousOperationAction(PointUint8* pData, PointUint8* pCommand)
+{
+    //首先判断是否为准备状态，若不是则拒绝执行
+    if (SynchronousState.readyAction != TRUE)
+    {
+        return 0xA1;
+    }
+    
+    uint8_t result = 0;
+     //Step 2:  生成针对同步控制器IO报文    
+    if (pData->len < 4)//命令控制字至少4个字节
+    {
+        return  0xA2;
+    }
+    //同步控制器预制命令(DSP)
+    StationList[SYNCHRONIZATION_INDEX].SendFrame.len = 8;
+    result = MakeIOMessage(&StationList[SYNCHRONIZATION_INDEX].SendFrame, MacList[SYNCHRONIZATION_INDEX], pData->pData, pData->len);  
+    if (result == FALSE)
+    {
+        return 0xA3;
+    }
+    StationList[SYNCHRONIZATION_INDEX].SendFrame.waitFlag = TRUE;
+    StationList[SYNCHRONIZATION_INDEX].StationInformation.enable = FALSE; //轮询置位False，暂停一般轮询发送
+    
+    SendData(&StationList[SYNCHRONIZATION_INDEX].SendFrame);
+   
+    return 0;
+    
+}
+/**
+ * 同步操作执行应答
+ *
+ * @param   pStation   DSP命令控制字
+ * @param   pbuff      指向缓冲数据的指针
+ * @param   len        缓冲区长度
+ * @return             非0-错误代码，0--正确
+ */
+uint8_t  SynchronousOperationActionACK(struct DefStationElement* pStation, BYTE* pbuff, BYTE len)
+{
+//    uint8_t result = 0;
+     uint8_t i = 0;
+    //2S，超时判断
+   if(IsOverTime(SynchronousState.startTime, SynchronousState.delayTime))
+   {
+       SynchronousState.readyAction = FALSE;
+       WorkMode &= 0xFFCF; //清除工作模式  
+       //使能一般循环
+       EnableNormalCycle();
+       return 0xA1;
+   }
+   
+   //判断是否发送等待
+   if(pStation->SendFrame.waitFlag == 0)
+   {
+       return 0xA2;
+   }
+   //检测是否错误
+   if (pbuff[0] == 0x14)
+   {
+       //此处取消本次任务
+       
+       return 0xA3;
+   }
+   //正常应答数据仅仅是ID号与0x80相与，其它相同
+   //比较长度
+   if(pStation->SendFrame.len != len)
+   {
+       return 0xA4;
+   }
+   //比较是否为ID应答
+   if(pStation->SendFrame.pBuffer[0] != (pbuff[0] | 0x80))
+   {
+       return 0xA5;
+   }
+   for(i = 1; i < len; i++)
+   {
+       if(pStation->SendFrame.pBuffer[0] != pbuff[0])
+       {
+           return 0xA6;
+       }
+   }
+    SynchronousState.readyAction = FALSE;    
+    CLREA_WORK_MODE(WORK_ACTION_SYN);//清除 同步工作模式 
+        
+        //使能一般循环
+    EnableNormalCycle();
+   //TODO:正常执行
+   
+   return 0;
+    
+}
+/**
+ * 校验工作模式
+ */
+void CheckDeviceNetWorkMode(void)
+{
+    uint8_t result = 0;
+    //同步--预制模式
+    if(WORK_MODE_RUNING(WORK_READY_SYN))
+    {
+        result = IsOverTime(SynchronousState.startTime, SynchronousState.delayTime);
+        if(result != 0)//超时
+        {            
+            CLREA_WORK_MODE(WORK_READY_SYN);//清除标志位
+             //使能一般循环
+            EnableNormalCycle(); 
+            SynchronousState.readyAction = FALSE;            
+            //TODO:发送超时信息
+        }
+    }
+    //同步--执行模式
+    if(WORK_MODE_RUNING(WORK_ACTION_SYN))
+    {
+        result = IsOverTime(SynchronousState.startTime, SynchronousState.delayTime);
+        if(result != 0)//超时
+        {
+             CLREA_WORK_MODE(WORK_ACTION_SYN);//清除标志位
+            SynchronousState.readyAction = FALSE;    
+             //使能一般循环
+            EnableNormalCycle();           
+            //TODO:发送超时信息
+        }
+    }
+}
 
 
 

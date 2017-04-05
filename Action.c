@@ -8,6 +8,10 @@ uint8_t SendDataBuffer[64] = {0};
 
 static void FrameServer(uint8_t* pData, uint8_t  len, uint8_t mac_id);
 static void MasterStationServer(PointUint8* pData);
+
+
+
+
 /**
  * 执行功能代码
  *
@@ -22,16 +26,19 @@ void ExecuteFunctioncode(frameRtu* pRtu)
       
         uint8_t len = 0;
         GenRTUFrame(UP_ADDRESS, pRtu->funcode, pRtu->pData + 3, pRtu->datalen,SendDataBuffer, &len);
-        SendFrame(SendDataBuffer, len);     
+        SendFrame(SendDataBuffer, len); 
+        
         switch(pRtu->funcode)
         {
             case CAN_MESSAGE_TO_DOWN://CAN转发包
             {
+              
                FrameServer( pRtu->pData + 3, pRtu->datalen, 0);
                break;
             }
             case DOWN_CONCTROL://控制ARM部分
             {
+                
                 PointUint8 Point;
                 Point.pData = pRtu->pData + 3;
                 Point.len = pRtu->datalen;
@@ -103,8 +110,24 @@ static void FrameServer(uint8_t* pData, uint8_t  len, uint8_t mac_id)
                
             }
         }
+        else if (pData[0] == MacList[LOCAL_INDEX]) //ARM控制
+            
+        {
+             PointUint8 Point;
+             Point.pData = pData + 2; //去除2字节地址，移到有效数据位置
+             Point.len = len - 2; // 修正长度             
+             MasterStationServer(&Point);
+   
+        }
+       
     }
 }
+
+/**
+*发送命令数组,临时存储区
+ */
+static uint8_t CommandArray[8] = {0};
+static PointUint8  SendCommand;
 
 /**
  * 主站服务
@@ -117,26 +140,62 @@ static void FrameServer(uint8_t* pData, uint8_t  len, uint8_t mac_id)
  */
 static void MasterStationServer(PointUint8* pData)
 {
-    if (pData->len == 0)
+    //至少大于等于3，才能包含必要的数据
+    if (pData->len < 3) 
     {
         return;
     }
+   
     uint8_t function = pData->pData[0];
+    
     switch(function)
     {
-        case 1://重新所有连接建立
-        {
-            if (pData->len == 2)
-            {
-                RestartEstablishLink( pData->pData[1]);
-            }
-            break;
-        }
-        case 0x40://复位ARM
+        case 1: //复位ARM
         {
             NVIC_SystemReset();
             break;
         }
+        case 2://重新所有连接建立
+        {
+            if (pData->len == 4)
+            {
+                RestartEstablishLink( pData->pData[3]);
+            }
+            break;
+        }
+        case 0x20://执行同步命令
+       
+        {
+            pData->pData = pData->pData + 3;//移除功能码,2字节地址，余下部分为完整命令
+            pData->len = pData->len - 3; //修正长度
+            if (pData->len >= 3) //剩余命令至少大于等于3
+            {
+                uint8_t i =0;
+                CommandArray[i++] = 0x05;
+                CommandArray[i++] = 0x00;
+                //CommandArray[i++] = 0x00;
+                //CommandArray[i++] = 0x00;
+                SendCommand.pData = CommandArray;
+                SendCommand.len = i;
+                SynchronousOperationReady(pData, &SendCommand);
+            }            
+            break;
+        }
+        case 0x21: //执行同步执行命令
+        {
+            pData->pData = pData->pData + 3;//移除功能码,2字节地址，余下部分为完整命令
+            pData->len = pData->len - 3; //修正长度
+            if (pData->len >= 3) //剩余命令至少大于等于3
+            {
+                SynchronousOperationAction(pData, 0);
+            }     
+            break;            
+        }
+        default:
+        {
+            break;
+        }
+            
     }
     
 }

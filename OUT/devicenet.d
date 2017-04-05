@@ -7,7 +7,7 @@
 .\out\devicenet.o: D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx\system_LPC17xx.h
 .\out\devicenet.o: D:\Program Files (x86)\Keil_5.0\ARM\ARMCC\bin\..\include\string.h
 .\out\devicenet.o: source\DeviceNet\DeviceNet.h
+.\out\devicenet.o: .\source\App\Header.h
 .\out\devicenet.o: .\source\Module\can.h
 .\out\devicenet.o: .\source\Module\timer.h
 .\out\devicenet.o: source\DeviceNet\RTuframe.h
-.\out\devicenet.o: .\source\App\Header.h
