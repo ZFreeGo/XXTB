@@ -467,6 +467,21 @@
               <FileType>5</FileType>
               <FilePath>.\source\DeviceNet\DeviceNet.h</FilePath>
             </File>
+            <File>
+              <FileName>Buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\DeviceNet\Buffer.c</FilePath>
+            </File>
+            <File>
+              <FileName>Buffer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\source\DeviceNet\Buffer.h</FilePath>
+            </File>
+            <File>
+              <FileName>NetApp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\DeviceNet\NetApp.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

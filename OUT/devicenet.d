@@ -9,5 +9,7 @@
 .\out\devicenet.o: source\DeviceNet\DeviceNet.h
 .\out\devicenet.o: .\source\App\Header.h
 .\out\devicenet.o: .\source\Module\can.h
+.\out\devicenet.o: .\source\DeviceNet\buffer.h
 .\out\devicenet.o: .\source\Module\timer.h
 .\out\devicenet.o: source\DeviceNet\RTuframe.h
+.\out\devicenet.o: source\DeviceNet\NetApp.h

@@ -319,9 +319,9 @@ extern void RestartEstablishLink(uint8_t loop);
 extern struct DefStationElement* GetStationPoint(USINT macID);
 extern uint8_t  SynchronousOperationReady(PointUint8* pData, PointUint8* pCommand);
 extern uint8_t  SynchronousOperationAction(PointUint8* pData, PointUint8* pCommand);
-extern void CheckDeviceNetWorkMode(void);
-
-
+extern void UartSendMessage(uint8_t mac, BYTE* pbuff, BYTE len);
+extern BOOL MakeIOMessage(struct DefFrameData* pFrame, BYTE destMAC, BYTE* pData, BYTE datalen);
+extern void DeviceNetSendData(struct DefFrameData* pFrame);//需要根据具体平台改写
 #ifdef	__cplusplus
 }
 #endif /* __cplusplus */

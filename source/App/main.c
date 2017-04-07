@@ -23,6 +23,8 @@
 #include "RS485.h"
 #include "RtuFrame.h"
 #include "Action.h"
+#include "NetApp.h"
+
 
 //#define PLL0CFG_Val           0x00050063  MSEL0    M= 99  N= 5  Fcco = 400M
 //#define CCLKCFG_Val           0x00000003   4       CPU时钟 100M = 400/4
@@ -46,33 +48,13 @@ void CanInit (void)
 }
 frameRtu sendFrame, recvFrame;
 
-typedef struct TagConfigData
-{
-    uint8_t ID; //ID号
-    void* pData;//指向数据
-    uint8_t type;//类型    
-}ConfigData;
-
-float A = 1.234 ,C = 0;
-uint8_t B = 0;
+CAN_msg ReciveMsg;
 /**
  * main主函数 
  */
 int main (void) 
 {
-    ConfigData config[3];
-    config[0].ID = 1;
-    config[0].pData = &SendFrame;
-    config[0].type = 3;
-    config[1].ID = 2;
-    config[1].pData = &A;
-    config[1].type = 4;
-    config[0].ID = 3;
-    config[0].pData = &B;
-    config[0].type = 6;
-    
-    C = *(float*)config[1].pData;
-    
+
     uint16_t led1 = 0;
     uint16_t led2 = 1; 
     uint16_t result = 0;
@@ -93,7 +75,7 @@ int main (void)
 	led1 = 1 - led1;
 	
     InitDeviceNet();//初始化DeviceNet
-    
+    InitNetApp();
   
     while(1)
     {
@@ -103,6 +85,12 @@ int main (void)
         {
             ExecuteFunctioncode(&recvFrame);
         }
+        result = BufferDequeue(&ReciveMsg);
+        if (result)
+        {
+            DeviceNetReciveCenter(&(ReciveMsg.id), ReciveMsg.data, ReciveMsg.len);
+        }
+                
         CheckDeviceNetWorkMode();    
     }    
    // while(1);         

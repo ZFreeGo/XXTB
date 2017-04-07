@@ -8,9 +8,11 @@
 .\out\main.o: D:\Program Files (x86)\Keil_5.0\ARM\ARMCC\bin\..\include\math.h
 .\out\main.o: .\source\Module\DeviceIO.h
 .\out\main.o: .\source\Module\CAN.h
+.\out\main.o: .\source\DeviceNet\buffer.h
 .\out\main.o: .\source\Module\timer.h
 .\out\main.o: .\source\DeviceNet\DeviceNet.h
 .\out\main.o: .\source\App\Header.h
 .\out\main.o: .\source\Module\RS485.h
 .\out\main.o: .\source\DeviceNet\RtuFrame.h
 .\out\main.o: .\source\DeviceNet\Action.h
+.\out\main.o: .\source\DeviceNet\NetApp.h

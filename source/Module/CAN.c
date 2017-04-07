@@ -14,7 +14,7 @@
 #include <LPC17xx.H> 
 #include "CAN.h"
 #include "DeviceNet.h"
-
+#include "buffer.h"
 
 CAN_msg       CAN_TxMsg[2];                      /* CAN message for sending */
 CAN_msg       CAN_RxMsg[2];                      /* CAN message for receiving */                                
@@ -112,7 +112,7 @@ void CAN_setup (uint32_t ctrl)
   pCAN->IER   = 0;                               /* Disable all interrupts */
   pCAN->GSR   = 0;                               /* Clear status register */
   CAN_cfgBaudrate(ctrl, 100000);                 /* Set bit timing */
-  pCAN->IER   = 0x0003;                          /* Enable Tx and Rx interrupt */
+  pCAN->IER   = 0x0007;                          /* P369 Enable Tx  Rx Error Warning Interrupt Enable interrupt */
 }
 
 
@@ -360,6 +360,8 @@ void CAN_wrFilter (uint32_t ctrl, uint32_t id, uint8_t format)
 }
 
 
+
+
 /******************************************************************************
  *函数名： CAN_IRQHandler()
  *形参： void
@@ -388,19 +390,29 @@ void CAN_IRQHandler (void)
 
   /* check CAN controller 2 */
   icr = LPC_CAN2->ICR;                           /* clear interrupts */
-
-  if (icr & (1 << 0)) {                          /* CAN Controller #2 meassage is received */
+  
+    //接收中断
+  if (icr & (1 << 0))                           /* CAN Controller #2 meassage is received */
+  {                         
 	CAN_rdMsg (2, &CAN_RxMsg[1]);                /*  read the message */
     LPC_CAN2->CMR = (1 << 2);                    /* Release receive buffer */
 
     CAN_RxRdy[1] = 1;                            /*  set receive flag */
     
-    DeviceNetReciveCenter(&(CAN_RxMsg[1].id), CAN_RxMsg[1].data, CAN_RxMsg[1].len);
+    BufferEnqueue(CAN_RxMsg + 1);
+    //DeviceNetReciveCenter(&(CAN_RxMsg[1].id), CAN_RxMsg[1].data, CAN_RxMsg[1].len);
       
   }
 
-  if (icr & (1 << 1)) {                          /* CAN Controller #2 meassage is transmitted */
+  //发送中断
+  if (icr & (1 << 1)) 
+  {                          /* CAN Controller #2 meassage is transmitted */
 	CAN_TxRdy[1] = 1; 
+  }
+  //错误中断
+  if (icr & (1 << 2))
+  {
+      while(1);
   }
 
 }

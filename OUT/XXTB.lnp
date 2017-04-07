@@ -4,6 +4,8 @@
 ".\out\startup_lpc17xx.o"
 ".\out\main.o"
 ".\out\devicenet.o"
+".\out\buffer.o"
+".\out\netapp.o"
 ".\out\can.o"
 ".\out\deviceio.o"
 ".\out\rtc.o"

@@ -10,3 +10,4 @@
 .\out\action.o: D:\Program Files (x86)\Keil_5.0\ARM\Inc\NXP\LPC17xx\system_LPC17xx.h
 .\out\action.o: .\source\DeviceNet\DeviceNet.h
 .\out\action.o: .\source\App\Header.h
+.\out\action.o: D:\Program Files (x86)\Keil_5.0\ARM\ARMCC\bin\..\include\string.h

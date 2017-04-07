@@ -364,7 +364,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\source;.\source\DeviceNet;.\source\Module</IncludePath>
+              <IncludePath>.\source;.\source\DeviceNet;.\source\Module;.\source\App</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -446,6 +446,11 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\source\App\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>Header.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\source\App\Header.h</FilePath>
             </File>
           </Files>
         </Group>

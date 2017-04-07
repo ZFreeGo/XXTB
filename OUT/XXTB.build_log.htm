@@ -8,14 +8,14 @@ Project File Date:  03/30/2017
 
 <h2>Output:</h2>
 Build target 'CommunicationManagement'
-compiling main.c...
-source\App\main.c(78): warning:  #550-D: variable "result" was set but never used
-      uint16_t result = 0;
-source\App\main.c: 1 warning, 0 errors
+compiling Buffer.c...
 linking...
-Program Size: Code=8460 RO-data=816 RW-data=136 ZI-data=1808  
-".\OUT\XXTB.axf" - 0 Error(s), 1 Warning(s).
-Load "J:\\MyCode\\MDK\\XXTB\\OUT\\XXTB.axf" 
+Program Size: Code=10384 RO-data=816 RW-data=140 ZI-data=2340  
+".\OUT\XXTB.axf" - 0 Error(s), 0 Warning(s).
+</pre>
+</body>
+</html>
+B\\OUT\\XXTB.axf" 
 Set JLink Project File to "J:\MyCode\MDK\XXTB\JLinkSettings.ini"
 * JLink Info: Device "LPC1768" selected (512 KB flash, 32 KB RAM).
  
@@ -49,15 +49,77 @@ Erase Done.
 Programming Done.
 Verify OK.
 Application running ...
-</pre>
-</body>
-</html>
-          4
+.
+kpoints: 6
+Software-Breakpoints: 8192
+Watchpoints:          4
 JTAG speed: 1000 kHz
  
 Erase Done.
 Programming Done.
 Verify OK.
 Application running ...
-K.
+ster 3 (R3) while CPU is running
+***JLink Error: Can not read register 4 (R4) while CPU is running
+***JLink Error: Can not read register 5 (R5) while CPU is running
+***JLink Error: Can not read register 6 (R6) while CPU is running
+***JLink Error: Can not read register 7 (R7) while CPU is running
+***JLink Error: Can not read register 8 (R8) while CPU is running
+***JLink Error: Can not read register 9 (R9) while CPU is running
+***JLink Error: Can not read register 10 (R10) while CPU is running
+***JLink Error: Can not read register 11 (R11) while CPU is running
+***JLink Error: Can not read register 12 (R12) while CPU is running
+***JLink Error: Can not read register 13 (R13) while CPU is running
+***JLink Error: Can not read register 14 (R14) while CPU is running
+***JLink Error: Can not read register 15 (R15) while CPU is running
+***JLink Error: Can not read register 16 (XPSR) while CPU is running
+***JLink Error: Can not read register 17 (MSP) while CPU is running
+***JLink Error: Can not read register 18 (PSP) while CPU is running
+***JLink Error: Can not read register 20 (CFBP) while CPU is running
+Erase Done.
+Programming Done.
+Verify OK.
 Application running ...
+RONIZATION_INDEX], pData->pData, pData->len);  
+source\DeviceNet\NetApp.c(210): warning:  #223-D: function "SendData" declared implicitly
+      SendData(&StationList[SYNCHRONIZATION_INDEX].SendFrame);
+source\DeviceNet\NetApp.c(310): warning:  #1-D: last line of file ends without a newline
+  }
+source\DeviceNet\NetApp.c: 6 warnings, 0 errors
+".\OUT\XXTB.axf" - 3 Error(s), 14 Warning(s).
+Target not created
+TION_INDEX].SendFrame, MacList[SYNCHRONIZATION_INDEX], pData->pData, pData->len);  
+source\DeviceNet\NetApp.c(210): warning:  #223-D: function "SendData" declared implicitly
+      SendData(&StationList[SYNCHRONIZATION_INDEX].SendFrame);
+source\DeviceNet\NetApp.c(268): error:  #20: identifier "WorkMode" is undefined
+      CLREA_WORK_MODE(WORK_ACTION_SYN);//清除 同步工作模式 
+source\DeviceNet\NetApp.c(284): error:  #20: identifier "WorkMode" is undefined
+      if(WORK_MODE_RUNING(WORK_READY_SYN))
+source\DeviceNet\NetApp.c(297): error:  #20: identifier "WorkMode" is undefined
+      if(WORK_MODE_RUNING(WORK_ACTION_SYN))
+source\DeviceNet\NetApp.c(310): warning:  #1-D: last line of file ends without a newline
+  }
+source\DeviceNet\NetApp.c: 6 warnings, 7 errors
+compiling CAN.c...
+compiling Action.c...
+".\OUT\XXTB.axf" - 10 Error(s), 13 Warning(s).
+Target not created
+rce\Module\CAN.h(38): error:  #20: identifier "CAN_msg" is undefined
+  extern CAN_msg       CAN_RxMsg[2];      /* CAN message for receiving */                                
+source\Module\CAN.c(17): error:  #5: cannot open source input file "buffer.h": No such file or directory
+  #include "buffer.h"
+source\Module\CAN.c: 0 warnings, 5 errors
+".\OUT\XXTB.axf" - 29 Error(s), 2 Warning(s).
+Target not created
+ed
+  void CAN_rdMsg         (uint32_t ctrl, CAN_msg *msg);
+source\Module\CAN.h(37): error:  #20: identifier "CAN_msg" is undefined
+  extern CAN_msg       CAN_TxMsg[2];      /* CAN messge for sending */
+source\Module\CAN.h(38): error:  #20: identifier "CAN_msg" is undefined
+  extern CAN_msg       CAN_RxMsg[2];      /* CAN message for receiving */                                
+source\Module\CAN.c(17): error:  #5: cannot open source input file "buffer.h": No such file or directory
+  #include "buffer.h"
+source\Module\CAN.c: 0 warnings, 5 errors
+compiling Action.c...
+".\OUT\XXTB.axf" - 34 Error(s), 3 Warning(s).
+Target not created
