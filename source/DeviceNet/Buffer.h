@@ -25,7 +25,7 @@ typedef struct TagFIFO
 }FifoInformation;
 
 
-extern void BuffeiInit(void);
+extern void BufferInit(void);
 extern uint8_t BufferEnqueue( CAN_msg* pMsg);
 extern uint8_t BufferDequeue( CAN_msg* pMsg);
 

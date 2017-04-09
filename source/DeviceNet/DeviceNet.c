@@ -37,7 +37,7 @@ static BOOL MakeUnconnectVisibleRequestMessageOnlyGroup2(struct DefFrameData* pF
     BYTE destMAC,BYTE serverCode, BYTE config);
 static void EstablishConnection(struct DefStationElement* pStation, USINT connectType);
 static void SlaveStationStatusCycleService(WORD* pID, BYTE* pbuff, BYTE len);
-
+static void SlaveStationStatusChangeService(WORD* pID, BYTE* pbuff, BYTE len);
 
 ////////////////////////////////////////////////////////////可考虑存入EEPROM
 UINT  providerID = 0X1234;               // 供应商ID 
@@ -97,6 +97,11 @@ struct DefStationElement*    g_pCurrrentStation;
 
 
 
+   //回传到上位机
+    USINT SendData[16] = {0};
+    USINT TempData[16] = {0};
+
+
 /**
  * 初始化所涉及的基本数据
  */
@@ -145,7 +150,8 @@ static void InitSlaveStationData(void)
         StationList[i].StationInformation.OverTimeCount = 0;
         
         StationList[i].StationInformation.online = 0;
-        StationList[i].StationInformation.state = 0;       
+        StationList[i].StationInformation.state = 0;  
+        StationList[i].StationInformation.oldState = 0;          
     }
     StationList[0].StationInformation.macID =  MacList[0]; //永磁控制器A
     StationList[1].StationInformation.macID =  MacList[1]; //永磁控制器B
@@ -332,7 +338,7 @@ static void NormalTask(struct DefStationElement* pStation)
             {
                 pStation->StationInformation.delayTime = 1000;//1000mS超时间
             }
-            EstablishConnection(pStation, STATUS_CHANGE); //建立循环连接
+            EstablishConnection(pStation, STATUS_CHANGE); //建立状态改变连接
             break;
         }
         case STEP_STATUS_CHANGE://建立状态改变连接
@@ -352,7 +358,10 @@ static void NormalTask(struct DefStationElement* pStation)
         case STEP_CYCLE: //循环建立连接
         {
             pStation->StationInformation.startTime = g_MsTicks; 
-            pStation->StationInformation.delayTime = 1000;//1000mS超时间
+            pStation->StationInformation.delayTime = 2000;//1000mS超时间
+            
+                       
+            
             break;
         }
        
@@ -369,6 +378,7 @@ static void NormalTask(struct DefStationElement* pStation)
 void MainDeviceNetTask(void)
 {
     
+        
         for(USINT i = 0; i < STATION_COUNT; i++)//STATION_COUNT
         {
             if (StationList[i].StationInformation.enable != TRUE)
@@ -376,10 +386,26 @@ void MainDeviceNetTask(void)
                 continue;
             }
               //是否超时，时间是否到。
-              if (IsOverTime(StationList[i].StationInformation.startTime, StationList[i].StationInformation.delayTime) )
-              {
-                  NormalTask(StationList + i);
-              }        
+            if (IsOverTime(StationList[i].StationInformation.startTime, StationList[i].StationInformation.delayTime) )
+            {
+                NormalTask(StationList + i);
+            } 
+              //判读状态是否发生改变，若改变发送信息
+            if (StationList[i].StationInformation.state != StationList[i].StationInformation.oldState)
+            {
+                uint8_t k = 0;
+                uint8_t datalen = 0;
+                StationList[i].StationInformation.oldState = StationList[i].StationInformation.state;
+                
+                TempData[k++] = DeviceNetObj.MACID;//添加上传信息
+                TempData[k++] = 0xAA;
+                TempData[k++] = 0x1A | 0x80;
+                TempData[k++] = StationList[i].StationInformation.macID;
+                TempData[k++] = 0;                                       
+                TempData[k++] = StationList[i].StationInformation.oldState;
+                GenRTUFrame(UP_ADDRESS, CAN_MESSAGE_TO_UP, TempData, k,SendData, &datalen);
+                SendFrame(SendData, datalen); 
+            }
         }
     
 }
@@ -722,7 +748,13 @@ BOOL DeviceNetReciveCenter(WORD* pID, BYTE * pbuff, BYTE len)
             {
                 SlaveStationStatusCycleService(pID, pbuff, len);
                 break;
-            }            
+            }   
+            case GROUP1_STATUS_CYCLE_ACK: //从站状态改变
+            {
+                SlaveStationStatusChangeService(pID, pbuff, len);
+                break;
+            }
+    
             default:
             {
                 break;
@@ -807,16 +839,15 @@ void RestartEstablishLink(uint8_t mac)
  */
 void UartSendMessage(uint8_t mac, BYTE* pbuff, BYTE len)
 {
-    //回传到上位机
-    USINT sendData[16] = {0};
-    USINT tempData[16] = {0};
+ 
     USINT datalen = 0;
-    tempData[0] = mac;//添加上传信息
-    tempData[1] = 0xAA;
-    memcpy(tempData + 2, pbuff, len);//拷贝数据，要求源地址与目的地址范围没有冲突。
-    GenRTUFrame(UP_ADDRESS, CAN_MESSAGE_TO_UP, tempData, len + 2,sendData, &datalen);
-    SendFrame(sendData, datalen);  
+    TempData[0] = mac;//添加上传信息
+    TempData[1] = 0xAA;
+    memcpy(TempData + 2, pbuff, len);//拷贝数据，要求源地址与目的地址范围没有冲突。
+    GenRTUFrame(UP_ADDRESS, CAN_MESSAGE_TO_UP, TempData, len + 2,SendData, &datalen);
+    SendFrame(SendData, datalen);  
 }
+
 /**
  * 从站从站IO轮询或状态变化/循环应答消息
  *
@@ -834,6 +865,28 @@ static void SlaveStationStatusCycleService(WORD* pID, BYTE* pbuff, BYTE len)
         if((pStation->StationInformation.state & CYC_INQUIRE) ==CYC_INQUIRE )
         {
             StationStatusCycleService(pStation, pbuff, len);            
+        }
+    }
+     
+   
+}
+/**
+ * 从站从站状态改变应答信息
+ *
+ * @param   pID     ID号指针
+ * @param   pbuff   指向缓冲区数据指针
+ * @param   len     缓冲区数据长度
+ */
+static void SlaveStationStatusChangeService(WORD* pID, BYTE* pbuff, BYTE len)
+{
+    BYTE  mac = GET_GROUP1_MAC(*pID);
+    struct DefStationElement* pStation =  GetStationPoint(mac);
+    if (pStation != 0)
+    {
+        //检测是否已经建立循环连接
+        if((pStation->StationInformation.state & CYC_INQUIRE) ==CYC_INQUIRE )
+        {
+            StationStatusChangeService(pStation, pbuff, len);            
         }
     }
      

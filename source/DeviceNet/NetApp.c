@@ -72,7 +72,19 @@ void StationStatusCycleService(struct DefStationElement* pStation,  BYTE* pbuff,
     //执行普通任--转移到普通模式下运行           
     SET_WORK_MODE(WORK_NORMOL_TASK);
 }
-
+/**
+ * 从站状态改变消息
+ *
+ * @param   pID     ID号指针
+ * @param   pbuff   指向缓冲区数据指针
+ * @param   len     缓冲区数据长度
+ */
+void StationStatusChangeService(struct DefStationElement* pStation,  BYTE* pbuff, BYTE len)
+{
+    //此为关键信息，需要进行立即处理
+     UartSendMessage(pStation->StationInformation.macID, pbuff, len);
+}
+    
 /**
  * 使能一般循环
  */

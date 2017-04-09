@@ -232,7 +232,8 @@ struct DefFrameData
 struct DefStationInformation 
 {
     USINT macID; //站点MAC
-    USINT state;  //站点配置状态--已经建立的连接    
+    USINT state;  //站点配置状态--已经建立的连接
+    USINT oldState; //用于进行状态改变对比
     BOOL  online; //在线标志 TRUE--在线， OFF--离线
     USINT step; //处理步骤
     

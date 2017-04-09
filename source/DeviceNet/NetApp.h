@@ -8,5 +8,6 @@
 extern void CheckDeviceNetWorkMode(void);
 extern void InitNetApp(void);
 extern void StationStatusCycleService(struct DefStationElement* pStation,  BYTE* pbuff, BYTE len);
+extern void StationStatusChangeService(struct DefStationElement* pStation,  BYTE* pbuff, BYTE len);
 
 #endif
