@@ -413,6 +413,7 @@ void CAN_IRQHandler (void)
   if (icr & (1 << 2))
   {
       while(1);
+      
   }
 
 }

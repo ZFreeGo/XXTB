@@ -91,8 +91,8 @@ void StationStatusChangeService(struct DefStationElement* pStation,  BYTE* pbuff
 inline static void EnableNormalCycle(void)
 {
      StationList[0].StationInformation.enable = TRUE;
-     StationList[1].StationInformation.enable = FALSE;
-     StationList[2].StationInformation.enable = FALSE;
+     StationList[1].StationInformation.enable = TRUE;
+     StationList[2].StationInformation.enable = TRUE;
      StationList[SYNCHRONIZATION_INDEX].StationInformation.enable = TRUE;  
 }
 
@@ -127,7 +127,7 @@ uint8_t  SynchronousOperationReady(PointUint8* pData, PointUint8* pCommand)
     {
         return 0xA1;
     }
-    //成同步控制器预制命令(DSP)
+    //同步控制器预制命令(DSP)
     StationList[SYNCHRONIZATION_INDEX].SendFrame.len = 8;
     result = MakeIOMessage(&StationList[SYNCHRONIZATION_INDEX].SendFrame, MacList[SYNCHRONIZATION_INDEX], pData->pData, pData->len);        
     if (result == FALSE)
@@ -190,7 +190,7 @@ uint8_t  SynchronousOperationReadyACK(struct DefStationElement* pStation, BYTE* 
    if (pbuff[0] == 0x14)
    {
        //此处取消本次任务
-       
+       //TODO:报错
        return 0xA3;
    }
    //正常应答数据仅仅是ID号与0x80相与，其它相同

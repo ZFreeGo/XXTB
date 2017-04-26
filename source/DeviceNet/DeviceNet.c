@@ -161,8 +161,8 @@ static void InitSlaveStationData(void)
     StationList[5].StationInformation.macID =  MacList[5]; //监控C
 
     StationList[0].StationInformation.enable = TRUE;
-    StationList[1].StationInformation.enable = FALSE;
-    StationList[2].StationInformation.enable = FALSE;
+    StationList[1].StationInformation.enable = TRUE;
+    StationList[2].StationInformation.enable = TRUE;
     StationList[3].StationInformation.enable = TRUE;
     StationList[4].StationInformation.enable = FALSE;
     StationList[5].StationInformation.enable = FALSE;     

@@ -4,7 +4,7 @@
 #define TRUE 0xFF
 #define FALSE 0
 
-#define BUFFER_LEN  32
+#define BUFFER_LEN  48
 
 
 /**

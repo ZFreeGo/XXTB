@@ -580,7 +580,7 @@
             <File>
               <FileName>Action.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Action.c</FilePath>
+              <FilePath>.\source\DeviceNet\Action.c</FilePath>
             </File>
           </Files>
         </Group>
